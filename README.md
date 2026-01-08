@@ -1,11 +1,11 @@
-# 🩺 CareFlow | Clinical Monitoring System
+# 🩺 Nurso | Clinical Monitoring System
 
-<p align="center">
-    <img src="raw.githubusercontent.com" width="200" alt="Laravel Logo">
-</p>
+<!-- <p align="center">
+    <img src="raw.githubusercontent.com" width="200" alt="">
+</p> -->
 
-## 🌟 About CareFlow
-**CareFlow** is a modern, lightweight, and mobile-first clinical management system designed to empower nurses and healthcare providers. Born from a nursing background, this project aims to bridge the gap between healthcare expertise and modern web technology.
+## 🌟 About Nurso
+**Nurso** is a modern, lightweight, and mobile-first clinical management system designed to empower nurses and healthcare providers. Born from a nursing background, this project aims to bridge the gap between healthcare expertise and modern web technology.
 
 It replaces traditional paper-based charting with a real-time digital solution for tracking patient vitals and nursing handovers, specifically optimized for high-pressure medical environments.
 
@@ -38,14 +38,23 @@ It replaces traditional paper-based charting with a real-time digital solution f
 5. **Start development server:**
    ```bash
    php artisan serve
-**📊 Database Schema**
+
+---
+
+## 📊 Database Schema
 The system utilizes a structured relational database:
 Patients: Stores identity, bed numbers, and admission status.
 Vitals: Stores time-stamped clinical data linked to patients.
-**👨‍💻 Developed By**
+
+---
+
+## 👨‍💻 Author
 Developed by **Ehsanullah Pazhman**  
 📧 Email: ehsanpazhman@gmail.com  
 Focusing on building technology that saves time and lives in the healthcare sector.
+
+---
+
 **License**
 This project is licensed under the **MIT License** – free to use, modify, and distribute.
 
