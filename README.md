@@ -55,7 +55,7 @@ Focusing on building technology that saves time and lives in the healthcare sect
 
 ---
 
-**License**
+## License
 This project is licensed under the **MIT License** – free to use, modify, and distribute.
 
 

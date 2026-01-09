@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->tinyInteger('age')->unsigned();
             $table->enum('gender', ['male', 'female', 'other']);
-            $table->tinyInteger('bed_number')->unsigned();
-            $table->enum('status', ['admitted', 'discharged', 'under observation']);
+            $table->integer('bed_number')->unsigned();
+            $table->string('status', 30);
             $table->timestamps();
         });
     }
