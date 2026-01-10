@@ -1,18 +1,5 @@
 <!-- Container -->
 <div class="max-w-2xl mx-auto mt-10 px-4">
-    @if (session()->has('success'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-            class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-2xl flex items-center gap-3 transition-all">
-            <div class="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <p class="text-sm font-bold text-green-700 dark:text-green-400 italic">
-                {{ session('success') }}
-            </p>
-        </div>
-    @endif
     <!-- Card Frame -->
     <div
         class="bg-white dark:bg-slate-900 shadow-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden">

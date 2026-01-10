@@ -37,7 +37,18 @@ class PatientForm extends Component
 
     #[Validate('required|in:admitted,discharged,under_observation')]
     public string $status = '';
-
+    public function mount($patientId = null)
+    {
+        if ($patientId) {
+            $patient = Patient::findOrFail($patientId);
+            $this->patientId  = $patient->id;
+            $this->name       = $patient->name;
+            $this->age        = $patient->age;
+            $this->bed_number = $patient->bed_number;
+            $this->gender     = $patient->gender;
+            $this->status     = $patient->status;
+        }
+    }
     public function save()
     {
         $this->validate();
@@ -53,19 +64,11 @@ class PatientForm extends Component
             ]
         );
         session()->flash('success', 'Patient data processed successfully!');
-        $this->reset(['patientId', 'name', 'age', 'bed_number', 'gender', 'status']);
+        return redirect()->route('patients.index');
     }
-
-    public function edit(int $patientId)
+    public function updated($propertyName)
     {
-        $patient = Patient::findOrFail($patientId);
-
-        $this->patientId  = $patient->id;
-        $this->name       = $patient->name;
-        $this->age        = $patient->age;
-        $this->bed_number = $patient->bed_number;
-        $this->gender     = $patient->gender;
-        $this->status     = $patient->status;
+        $this->validateOnly($propertyName);
     }
     public function render()
     {
