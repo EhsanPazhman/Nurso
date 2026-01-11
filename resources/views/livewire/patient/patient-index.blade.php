@@ -56,6 +56,11 @@
                     </th>
                 </tr>
             </thead>
+            @if ($search && $patients->isEmpty())
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    No results found for "<strong>{{ $search }}</strong>"
+                </div>
+            @endif
             <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                 @foreach ($patients as $patient)
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -91,14 +96,14 @@
                         <td class="p-6">
                             <div class="flex justify-end gap-2">
                                 <!-- Vitals Action -->
-                                <button
+                                <a href="{{ route('patients.vitals', $patient->id) }}"
                                     class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 rounded-xl transition-colors cursor-pointer"
                                     title="Add Vitals">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
-                                </button>
+                                </a>
                                 <!-- Edit Action -->
                                 <a href="{{ route('patients.edit', $patient->id) }}"
                                     class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 rounded-xl transition-colors"

@@ -28,7 +28,7 @@ class PatientIndex extends Component
             'patients' => Patient::where('name', 'like', '%' . $this->search . '%')
                 ->orWhere('bed_number', 'like', '%' . $this->search . '%')
                 ->latest()
-                ->paginate(1)
+                ->paginate(10),
         ])->layout('layouts.app');
     }
 }
