@@ -10,7 +10,7 @@ class Dashboard extends Component
 {
     public $patientCount;
     public $criticalCaseCount;
-    public $wardCapacity = 7; 
+    public $wardCapacity = 20; 
     public $usagePercent = 0;
     public $last24HoursAdmissions;
     public $recentVitals;

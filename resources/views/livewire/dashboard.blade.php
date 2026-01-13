@@ -26,22 +26,46 @@
 
         <!-- Critical Cases (SPO2 < 92) -->
         <div
-            class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-red-100 dark:border-red-900/20 shadow-xl">
+            class="p-6 rounded-[2.5rem] border shadow-xl transition-all duration-500 
+    {{ $criticalCaseCount > 0
+        ? 'bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-900/20'
+        : 'bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/20' }}">
+
             <div class="flex items-center justify-between mb-4">
                 <div
-                    class="w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center text-red-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-500
+            {{ $criticalCaseCount > 0
+                ? 'bg-red-100 dark:bg-red-900/40 text-red-600'
+                : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600' }}">
+
+                    @if ($criticalCaseCount > 0)
+                        <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    @else
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    @endif
                 </div>
-                <span class="text-[10px] font-black uppercase text-red-400">Critical Alerts</span>
+
+                <span
+                    class="text-[10px] font-black uppercase tracking-wider
+            {{ $criticalCaseCount > 0 ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400' }}">
+                    {{ $criticalCaseCount > 0 ? 'Critical Alerts' : 'All Patients Safe' }}
+                </span>
             </div>
-            <p class="text-3xl font-black text-red-600 tracking-tight">{{ $criticalCaseCount }}</p>
+
+            <p
+                class="text-3xl font-black tracking-tight 
+        {{ $criticalCaseCount > 0 ? 'text-red-600' : 'text-emerald-700 dark:text-emerald-400' }}">
+                {{ $criticalCaseCount }}
+            </p>
         </div>
 
         <!-- Available Beds -->
-        <!-- Ward Capacity Card (Dynamic Color) -->
         <div
             class="p-6 rounded-[2.5rem] border shadow-xl transition-colors duration-500 
     {{ $usagePercent >= 90 ? 'bg-orange-50/50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800' }}">
