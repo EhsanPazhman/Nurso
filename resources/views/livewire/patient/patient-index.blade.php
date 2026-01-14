@@ -46,23 +46,30 @@
     <!-- Table Container -->
     <div
         class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-slate-100 dark:border-slate-800">
-                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Patient / ID</th>
-                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bed</th>
-                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
-                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions
-                    </th>
-                </tr>
-            </thead>
-            @if ($search && $patients->isEmpty())
-                <div class="mt-6 text-center text-sm text-slate-500">
+        @if ($patients->isEmpty())
+            <div class="m-6 text-center text-sm text-slate-500">
+                @if (filled($search))
                     No results found for "<strong>{{ $search }}</strong>"
-                </div>
-            @endif
-            <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                @foreach ($patients as $patient)
+                @else
+                    <h1>No patients registered in the system.</h1>
+                @endif
+            </div>
+        @endif
+
+        @foreach ($patients as $patient)
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-100 dark:border-slate-800">
+                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Patient / ID
+                        </th>
+                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bed</th>
+                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
+                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="p-6">
                             <div class="flex items-center gap-4">
@@ -126,9 +133,10 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        @endforeach
+
     </div>
     <!-- Pagination -->
     <div class="mt-6">
