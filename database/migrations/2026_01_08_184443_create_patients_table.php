@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female', 'other']);
             $table->integer('bed_number')->unsigned();
             $table->string('status', 30);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

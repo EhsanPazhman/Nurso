@@ -61,6 +61,7 @@ class PatientForm extends Component
                 'bed_number' => $this->bed_number,
                 'gender'     => $this->gender,
                 'status'     => $this->status,
+                'user_id'    => auth()->id() ?? 1,
             ]
         );
         session()->flash('success', 'Patient data processed successfully!');

@@ -1,17 +1,4 @@
 <div class="max-w-6xl mx-auto mt-10 px-4 pb-20">
-    @if (session()->has('success'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-            class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-2xl flex items-center gap-3 transition-all">
-            <div class="w-8 h-8 bg-green-500 rounded-xl flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <p class="text-sm font-bold text-green-700 dark:text-green-400 italic">
-                {{ session('success') }}
-            </p>
-        </div>
-    @endif
     <!-- Header & Search -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
@@ -55,20 +42,19 @@
                 @endif
             </div>
         @endif
-
-        @foreach ($patients as $patient)
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-slate-100 dark:border-slate-800">
-                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Patient / ID
-                        </th>
-                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bed</th>
-                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
-                        <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-slate-100 dark:border-slate-800">
+                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Patient / ID
+                    </th>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Bed</th>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            @foreach ($patients as $patient)
                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                         <td class="p-6">
@@ -134,9 +120,8 @@
                         </td>
                     </tr>
                 </tbody>
-            </table>
-        @endforeach
-
+            @endforeach
+        </table>
     </div>
     <!-- Pagination -->
     <div class="mt-6">
