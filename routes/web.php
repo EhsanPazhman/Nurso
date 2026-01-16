@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\UserManagement;
 use App\Models\Patient;
 use App\Livewire\Dashboard;
 use App\Livewire\Auth\Login;
@@ -18,6 +19,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('create', PatientForm::class)->name('patients.create');
         Route::get('{patientId}/edit', PatientForm::class)->name('patients.edit');
         Route::get('{patientId}/vitals', PatientVitals::class)->name('patients.vitals');
+        Route::get('register', UserManagement::class)->name('staff.register');
     });
 });
 Route::get('/logout', function () {

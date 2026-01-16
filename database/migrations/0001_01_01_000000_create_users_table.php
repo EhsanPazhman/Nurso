@@ -19,9 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->string('role')->default('nurse');
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->text('path')->nullable();
             $table->rememberToken();
             $table->timestamps();
-             $table->foreign('parent_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('parent_id')->references('id')->on('users')->onDelete('set null');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

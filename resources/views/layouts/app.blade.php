@@ -78,7 +78,7 @@
                 </a>
 
                 <!-- Staff (Registration Link) -->
-                <a href="#" class="group relative flex items-center justify-center">
+                <a href="{{ route('staff.register') }}" class="group relative flex items-center justify-center">
                     <div class="p-4 text-slate-400 hover:text-emerald-600 transition-all duration-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

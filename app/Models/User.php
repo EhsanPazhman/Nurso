@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'path',
         'parent_id',
     ];
 
@@ -34,7 +35,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function children()
+    {
+        return $this->hasMany(User::class, 'parent_id');
+    }
 
+    public function parent()
+    {
+        return $this->belongsTo(User::class, 'parent_id');
+    }
     /**
      * Get the attributes that should be cast.
      *
