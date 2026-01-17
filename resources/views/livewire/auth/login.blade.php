@@ -78,8 +78,9 @@
 
                 <!-- Action Button -->
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white font-black uppercase tracking-[0.3em] text-[9px] py-4 rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-3">
-                    Authenticate Access
+                    class="w-full bg-blue-600 text-white font-black uppercase tracking-[0.3em] text-[9px] py-4 rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-3 cursor-pointer">
+                    <span wire:loading.remove>Authenticate Access</span>
+                    <span wire:loading>Processing...</span>
                 </button>
             </form>
         </div>
