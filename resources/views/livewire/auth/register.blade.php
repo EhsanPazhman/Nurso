@@ -134,9 +134,9 @@
 
         <!-- Action Link -->
         <div class="text-center mt-6">
-            <a href="{{ route('dashboard') }}"
+            <a href="{{ route('staffs') }}"
                 class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-emerald-600 transition-colors">
-                ← Return to Admin Dashboard
+                ← Return to staffs
             </a>
         </div>
     </div>

@@ -14,14 +14,15 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/login', Login::class)->name('login');
 });
 Route::middleware(['auth'])->group(function () {
-    Route::get('staff/register', Register::class)->name('register');
     Route::get('/', Dashboard::class)->name('dashboard');
-    Route::get('/dashboard/staffs', UserManagement::class)->name('staffs');
-    Route::group(['prefix' => 'patients'], function () {
-        Route::get('/', PatientIndex::class)->name('patients.index');
-        Route::get('create', PatientForm::class)->name('patients.create');
-        Route::get('{patientId}/edit', PatientForm::class)->name('patients.edit');
-        Route::get('{patientId}/vitals', PatientVitals::class)->name('patients.vitals');
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/staff/register', Register::class)->name('user.register');
+        Route::get('/staff/{id}/edit', Register::class)->name('user.edit');
+        Route::get('/staffs', UserManagement::class)->name('staffs');
+        Route::get('/patients', PatientIndex::class)->name('patients.index');
+        Route::get('/patient/create', PatientForm::class)->name('patients.create');
+        Route::get('/patient/{patientId}/edit', PatientForm::class)->name('patients.edit');
+        Route::get('/patient/{patientId}/vitals', PatientVitals::class)->name('patients.vitals');
     });
 });
 Route::get('/logout', function () {
