@@ -41,6 +41,15 @@
     <!-- Staff Table -->
     <div
         class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[3rem] border border-white/20 dark:border-slate-800/50 shadow-2xl overflow-hidden">
+        @if ($users->isEmpty())
+            <div class="m-6 text-center text-sm text-slate-500">
+                @if (filled($search) || filled($filterRole))
+                    No results found for "<strong>{{ $search . $filterRole }}</strong>"
+                @else
+                    <h1>No staff registered in the system.</h1>
+                @endif
+            </div>
+        @endif
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="border-b border-slate-100 dark:border-slate-800">
