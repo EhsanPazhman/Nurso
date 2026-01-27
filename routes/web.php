@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 Route::get('/logout', function () {
-    auth()->logout();
+    auth()->guard()->logout();
     session()->invalidate();
     session()->regenerateToken();
     return redirect()->route('login');

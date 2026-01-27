@@ -31,7 +31,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($patient)
-                ->causedBy(auth()->user())
+                ->causedBy(auth()->guard()->user())
                 ->withProperties(['patient_code' => $patient->patient_code])
                 ->log('Patient created');
 
@@ -59,7 +59,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($updatedPatient)
-                ->causedBy(auth()->user())
+                ->causedBy(auth()->guard()->user())
                 ->log('Patient updated');
 
             return $updatedPatient;
@@ -78,7 +78,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($patient)
-                ->causedBy(auth()->user())
+                ->causedBy(auth()->guard()->user())
                 ->log('Patient deleted');
         });
     }
@@ -93,7 +93,7 @@ class PatientService
 
         activity('patient')
             ->performedOn($patient)
-            ->causedBy(auth()->user())
+            ->causedBy(auth()->guard()->user())
             ->log('Patient restored');
 
         return $patient;
