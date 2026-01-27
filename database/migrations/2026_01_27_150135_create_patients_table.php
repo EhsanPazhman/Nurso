@@ -13,12 +13,6 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->tinyInteger('age')->unsigned();
-            $table->enum('gender', ['male', 'female', 'other']);
-            $table->integer('bed_number')->unsigned();
-            $table->string('status', 30);
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
