@@ -2,77 +2,55 @@
 
 namespace App\Livewire\Patient;
 
-use App\Models\Patient;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
-
+use Illuminate\Support\Facades\Http;
 
 class PatientForm extends Component
 {
-    public array $genders = [
-        'male'   => 'Male',
-        'female' => 'Female',
-        'other'  => 'Other',
-    ];
-
-    public array $statuses = [
-        'admitted'           => 'Admitted',
-        'discharged'         => 'Discharged',
-        'under_observation'  => 'Under Observation',
-    ];
-
     public ?int $patientId = null;
 
-    #[Validate('required|string|min:3|max:100')]
-    public string $name = '';
+    public array $form = [
+        'first_name' => '',
+        'last_name' => '',
+        'father_name' => '',
+        'gender' => '',
+        'date_of_birth' => '',
+        'phone' => '',
+        'secondary_phone' => '',
+        'national_id' => '',
+        'address' => '',
+    ];
 
-    #[Validate('required|integer|min:1|max:120')]
-    public ?int $age = null;
-
-    #[Validate('required|integer|min:1|max:500')]
-    public ?int $bed_number = null;
-
-    #[Validate('required|in:male,female,other')]
-    public string $gender = '';
-
-    #[Validate('required|in:admitted,discharged,under_observation')]
-    public string $status = '';
-    public function mount($patientId = null)
+    public function mount(?int $patientId = null)
     {
         if ($patientId) {
-            $patient = Patient::findOrFail($patientId);
-            $this->patientId  = $patient->id;
-            $this->name       = $patient->name;
-            $this->age        = $patient->age;
-            $this->bed_number = $patient->bed_number;
-            $this->gender     = $patient->gender;
-            $this->status     = $patient->status;
+            $this->patientId = $patientId;
+
+            $response = Http::withToken(auth()->user()->currentAccessToken()->plainTextToken ?? '')
+                ->get(config('app.url') . "/api/patients/{$patientId}");
+
+            $this->form = array_merge($this->form, $response->json());
         }
     }
+
     public function save()
     {
-        $this->validate();
+        $url = config('app.url') . '/api/patients';
+        $method = 'post';
 
-        Patient::updateOrCreate(
-            ['id' => $this->patientId],
-            [
-                'name'       => $this->name,
-                'age'        => $this->age,
-                'bed_number' => $this->bed_number,
-                'gender'     => $this->gender,
-                'status'     => $this->status,
-                'user_id'    => auth()->id() ?? 1,
-            ]
-        );
-        session()->flash('success', 'Patient data processed successfully!');
+        if ($this->patientId) {
+            $url .= "/{$this->patientId}";
+            $method = 'put';
+        }
+
+        Http::withToken(auth()->user()->currentAccessToken()->plainTextToken ?? '')
+            ->{$method}($url, $this->form);
+
         return redirect()->route('patients.index');
     }
-    public function updated($propertyName)
-    {
-        $this->validateOnly($propertyName);
-    }
+
     public function render()
     {
-        return view('livewire.patient.patient-form')->layout('layouts.app');
+        return view('livewire.patient.patient-form');
     }
 }
