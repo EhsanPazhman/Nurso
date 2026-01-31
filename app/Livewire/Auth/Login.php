@@ -2,39 +2,33 @@
 
 namespace App\Livewire\Auth;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Illuminate\Support\Facades\Http;
 
 class Login extends Component
 {
-    public $email = '';
-    public $password = '';
-    public $remember = false;
-
-    protected $rules = [
-        'email' => 'required|email|exists:users,email',
-        'password' => 'required|min:6',
-    ];
+    public string $email = '';
+    public string $password = '';
 
     public function login()
     {
-        $this->validate();
+        $response = Http::post(url('/api/auth/login'), [
+            'email'    => $this->email,
+            'password' => $this->password,
+        ]);
 
-        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            session()->regenerate();
-            session()->flash('success', 'Access Authorized. Welcome back.');
-
-            return redirect()->intended(route('dashboard'));
+        if ($response->failed()) {
+            $this->addError('email', 'Invalid email or password');
+            return;
         }
 
-        throw ValidationException::withMessages([
-            'email' => __('The credentials provided do not match our records.'),
-        ]);
+        session(['api_token' => $response->json('token')]);
+
+        return redirect()->route('dashboard');
     }
 
     public function render()
     {
-        return view('livewire.auth.login')->layout('layouts.app');
+        return view('livewire.auth.login')->layout('layouts.guest');
     }
 }

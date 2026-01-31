@@ -1,114 +1,125 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en" class="h-full bg-slate-50">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{{ $title ?? 'Nurso' }}</title>
+    <title>Nerso HMS - Professional Management</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @livewireStyles
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
-    <div class="fixed top-6 right-6 z-50 flex flex-col gap-3 w-full max-w-sm">
+<body class="h-full antialiased text-slate-900" x-data="{ isSidebarExpanded: true }">
 
-        @if (session()->has('success'))
-            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-                class="p-4 bg-emerald-500 text-white rounded-2xl shadow-2xl shadow-emerald-500/20 flex items-center gap-3 border border-emerald-400/20">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <p class="text-[11px] font-black uppercase tracking-widest">{{ session('success') }}</p>
-            </div>
-        @endif
-
-        @if (session()->has('error'))
-            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-                class="p-4 bg-red-500 text-white rounded-2xl shadow-2xl shadow-red-500/20 flex items-center gap-3 border border-red-400/20">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="text-[11px] font-black uppercase tracking-widest">{{ session('error') }}</p>
-            </div>
-        @endif
-
-    </div>
-    <div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
-        <!-- Sidebar Navigation -->
-        @auth
-            <aside
-                class="fixed left-6 top-6 bottom-6 w-24 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[3rem] border border-white/20 dark:border-slate-800/50 shadow-2xl z-40 flex flex-col items-center py-10 justify-between">
-
-                <!-- Top: Logo -->
-                <div class="flex flex-col items-center gap-2">
-                    <div
-                        class="w-12 h-12 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center text-white font-black text-xl rotate-3">
-                        N
-                    </div>
+    <!-- Sidebar -->
+    <aside
+        class="fixed inset-y-0 left-0 bg-white border-r border-slate-200 z-50 transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden"
+        :class="isSidebarExpanded ? 'w-64' : 'w-20'">
+        <!-- Logo Area -->
+        <div class="p-6 h-20 flex items-center">
+            <div class="flex items-center gap-3 text-blue-600 font-bold text-2xl tracking-tight">
+                <div class="min-w-8 h-8 bg-blue-600 rounded flex items-center justify-center shrink-0">
+                    <span class="text-white text-xs font-bold">N</span>
                 </div>
+                <span x-show="isSidebarExpanded" x-cloak x-transition.opacity>NERSO</span>
+            </div>
+        </div>
 
-                <!-- Middle: Nav Links -->
-                <nav class="flex flex-col gap-8">
-                    <!-- Dashboard -->
-                    <a href="#" class="group relative flex items-center justify-center">
-                        <div
-                            class="p-4 bg-blue-50 dark:bg-blue-600/10 text-blue-600 rounded-2xl transition-all duration-300 group-hover:scale-110">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="absolute left-20 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Overview</span>
-                    </a>
+        <nav class="mt-2 px-4 pb-4 space-y-1">
+            <!-- Nav Group: Core -->
+            <p x-show="isSidebarExpanded" x-cloak
+                class="px-2 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">General</p>
 
-                    <!-- Patients -->
-                    <a href="{{ route('patients.index') }}" class="group relative flex items-center justify-center">
-                        <div class="p-4 text-slate-400 hover:text-blue-600 transition-all duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="absolute left-20 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Patients</span>
-                    </a>
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-blue-50 text-blue-700 group">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Dashboard</span>
+            </a>
 
-                    <!-- Staff (Registration Link) -->
-                    <a href="{{ route('staffs') }}" class="group relative flex items-center justify-center">
-                        <div class="p-4 text-slate-400 hover:text-emerald-600 transition-all duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="absolute left-20 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Staffs</span>
-                    </a>
-                </nav>
+            <p x-show="isSidebarExpanded" x-cloak
+                class="mt-6 px-2 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medical Services
+            </p>
 
-                <!-- Bottom: User & Logout -->
-                <div class="flex flex-col gap-6 items-center">
-                    <a href="{{ route('logout') }}"
-                        class="p-3 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                        </svg>
-                    </a>
-                </div>
-            </aside>
-        @endauth
-        <!-- Main Content Area -->
-        <main class="flex-1 ml-32">
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 transition group">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Patients</span>
+            </a>
+
+            <a href="#"
+                class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 transition group">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span x-show="isSidebarExpanded" x-cloak x-transition.opacity
+                    class="whitespace-nowrap">Appointments</span>
+            </a>
+
+            <div class="pt-10">
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-50 transition group">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span x-show="isSidebarExpanded" x-cloak x-transition.opacity
+                        class="whitespace-nowrap">Logout</span>
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="transition-all duration-300 ease-in-out min-h-screen" :class="isSidebarExpanded ? 'ml-64' : 'ml-20'">
+        <!-- Top Utility Bar -->
+        <div
+            class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-3 flex justify-between items-center h-20">
+            <div class="flex items-center gap-4">
+                <!-- Toggle Button -->
+                <button @click="isSidebarExpanded = !isSidebarExpanded"
+                    class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors focus:outline-none  cursor-pointer">
+                    <svg class="w-6 h-6 transition-transform duration-300" :class="{ 'rotate-180': !isSidebarExpanded }"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div class="text-sm font-medium text-slate-500">Welcome back, Dr. Arash</div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300"></div>
+            </div>
+        </div>
+
+        <div class="p-8">
             {{ $slot }}
-        </main>
-    </div>
-    @livewireScripts
+        </div>
+    </main>
+
 </body>
 
 </html>
