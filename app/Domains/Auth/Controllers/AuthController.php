@@ -3,9 +3,10 @@
 namespace App\Domains\Auth\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Controller;
+use App\Domains\Auth\Models\Role;
 use App\Domains\Auth\Models\User;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -50,5 +51,35 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out'
         ]);
+    }
+    public function register(Request $request)
+    {
+        // $this->authorize('create', User::class);
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            'role'     => 'required|exists:roles,name',
+        ]);
+
+        $user = User::create([
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $role = Role::where('name', $validated['role'])->first();
+        $user->roles()->attach($role);
+
+        return response()->json([
+            'message' => 'Staff registered successfully',
+            'data' => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => $role->name,
+            ],
+        ], 201);
     }
 }
