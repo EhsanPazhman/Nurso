@@ -1,66 +1,49 @@
 <?php
 
 namespace App\Livewire\Auth;
-
-use App\Models\User;
 use Livewire\Component;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 class Register extends Component
 {
-    public ?int $id = null;
-    public $name, $email, $role = 'nurse', $password;
+    public string $name = '';
+    public string $email = '';
+    public string $password = '';
+    public string $role = '';
 
-    public function mount($id = null)
+    protected array $rules = [
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|email',
+        'password' => 'required|min:8',
+        'role'     => 'required',
+    ];
+
+    public function submit()
     {
-        if ($id) {
-            $user = User::findOrFail($id);
-            $this->id       = $user->id; 
-            $this->name     = $user->name;
-            $this->email    = $user->email;
-            $this->role     = $user->role;
-        }
-    }
+        $this->validate();
 
-    public function store()
-    {
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->id,
-            'role' => 'required|in:admin,supervisor,nurse',
-            'password' => $this->id ? 'nullable|min:8' : 'required|min:8',
-        ]);
-
-        $creator = auth()->user();
-
-        $data = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'role' => $this->role,
-        ];
-
-        if ($this->password) {
-            $data['password'] = Hash::make($this->password);
-        }
-
-        if (!$this->id) {
-            $data['parent_id'] = $creator->id;
-        }
-
-        $newUser = User::updateOrCreate(['id' => $this->id], $data);
-
-        if (!$this->id || empty($newUser->path)) {
-            $newUser->update([
-                'path' => ($creator->path ?? '') . $newUser->id . '/',
+        $response = Http::withToken(session('api_token'))
+            ->post(url('/api/auth/register'), [
+                'name'     => $this->name,
+                'email'    => $this->email,
+                'password' => $this->password,
+                'role'     => $this->role,
             ]);
+        if ($response->failed()) {
+            $data = json_decode($response->body(), true);
+            $message = isset($data['message']) ? $data['message'] : 'Registration failed';
+            $this->addError('email', $message);
+            return;
         }
 
-        session()->flash('success', 'Staff account updated/deployed successfully!');
-        return redirect()->route('staffs');
+        session()->flash('success', 'Staff registered successfully');
+
+        $this->reset(['name', 'email', 'password', 'role']);
     }
 
     public function render()
     {
-        return view('livewire.auth.register')->layout('layouts.app');
+        return view('livewire.auth.register')
+            ->layout('layouts.app');
     }
 }
