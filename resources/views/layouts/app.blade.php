@@ -86,6 +86,36 @@
         </nav>
     </aside>
 
+    {{-- SESSION (after redirect) --}}
+    @if (session()->has('notify'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="fixed top-6 right-6 z-50">
+            <div class="text-white px-6 py-3 rounded-xl shadow-lg" @class([
+                'bg-emerald-500' => session('notify.type') === 'success',
+                'bg-red-500' => session('notify.type') === 'error',
+            ])>
+                {{ session('notify.message') }}
+            </div>
+        </div>
+    @endif
+
+    {{-- LIVEWIRE (redirect) --}}
+    <div x-data="{ show: false, message: '', type: 'success' }"
+        x-on:notify.window="
+        message = $event.detail.message;
+        type = $event.detail.type;
+        show = true;
+        setTimeout(() => show = false, 3000);
+    ">
+        <template x-if="show">
+            <div class="fixed top-6 right-6 z-50">
+                <div :class="type === 'success' ? 'bg-emerald-500' : 'bg-red-500'"
+                    class="text-white px-6 py-3 rounded-xl shadow-lg">
+                    <span x-text="message"></span>
+                </div>
+            </div>
+        </template>
+    </div>
+
     <!-- Main Content Area -->
     <main class="transition-all duration-300 ease-in-out min-h-screen" :class="isSidebarExpanded ? 'ml-64' : 'ml-20'">
         <!-- Top Utility Bar -->

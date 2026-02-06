@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire\Auth;
+
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
 
@@ -35,8 +36,11 @@ class Register extends Component
             $this->addError('email', $message);
             return;
         }
-
-        session()->flash('success', 'Staff registered successfully');
+        $this->dispatch(
+            'notify',
+            type: 'success',
+            message: 'Staff registered successfully'
+        );
 
         $this->reset(['name', 'email', 'password', 'role']);
     }

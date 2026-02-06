@@ -36,7 +36,12 @@ class Login extends Component
         session(['api_token' => $response->json('token')]);
         $user = User::where('email', $this->email)->first();
         Auth::login($user);
-        return redirect()->route('dashboard');
+        return redirect()
+            ->route('dashboard')
+            ->with('notify', [
+                'type' => 'success',
+                'message' => 'Logged in successfully',
+            ]);
     }
 
     public function render()
