@@ -77,19 +77,14 @@
             </div>
         </nav>
     </aside>
-
     {{-- SESSION (after redirect) --}}
     @if (session()->has('notify'))
-        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="fixed top-6 right-6 z-50">
-            <div class="text-white px-6 py-3 rounded-xl shadow-lg" @class([
-                'bg-emerald-500' => session('notify.type') === 'success',
-                'bg-red-500' => session('notify.type') === 'error',
-            ])>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-cloak class="fixed top-6 right-6 z-50">
+            <div class="text-white px-6 py-3 rounded-xl shadow-lg bg-emerald-800">
                 {{ session('notify.message') }}
             </div>
         </div>
     @endif
-
     {{-- LIVEWIRE (redirect) --}}
     <div x-data="{ show: false, message: '', type: 'success' }"
         x-on:notify.window="

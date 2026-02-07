@@ -3,30 +3,22 @@
 namespace App\Livewire\Patient;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Illuminate\Support\Facades\Http;
+use App\Domains\Patient\Models\Patient;
 
 class PatientList extends Component
 {
-    use WithPagination;
-
-    protected $paginationTheme = 'bootstrap';
-
-    public string $search = '';
-    public int $perPage = 15;
-
-    protected $queryString = ['search', 'page'];
+    public function mount()
+    {
+        abort_unless(
+            auth()->user()->can('patient.view'),
+            403
+        );
+    }
 
     public function render()
     {
-        $response = Http::withToken(auth()->user()->currentAccessToken()->plainTextToken ?? '')
-            ->get(config('app.url') . '/api/patients', [
-                'search' => $this->search,
-                'per_page' => $this->perPage,
-            ]);
-
         return view('livewire.patient.patient-list', [
-            'patients' => $response->json()
-        ]);
+            'patients' => Patient::latest()->paginate(10),
+        ])->layout('layouts.app');
     }
 }

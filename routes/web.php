@@ -11,3 +11,5 @@ Route::middleware('auth')->get('/dashboard', Dashboard::class)->name('dashboard'
 Route::middleware(['auth'])
     ->get('/staff/register', Register::class)
     ->name('staff.register');
+
+
