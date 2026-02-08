@@ -64,51 +64,49 @@
     <!-- Main Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Recent Patients Table -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="font-bold text-slate-800 tracking-tight">Recent Patient Admissions</h2>
-                    <button class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All</button>
+        @can('patient.view')
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                        <h2 class="font-bold text-slate-800 tracking-tight">Recent Patient Admissions</h2>
+                        <button class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All</button>
+                    </div>
+                    <table class="w-full text-left border-collapse">
+                        @empty($recentPatients)
+                            @foreach ($recentPatients as $patient)
+                                <thead>
+                                    <tr class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                        <th class="px-6 py-3 border-b border-slate-100">Patient</th>
+                                        <th class="px-6 py-3 border-b border-slate-100">ID</th>
+                                        <th class="px-6 py-3 border-b border-slate-100">Dept</th>
+                                        <th class="px-6 py-3 border-b border-slate-100">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="px-6 py-4">
+                                            <div class="font-semibold text-slate-700 text-sm">{{ $patient->full_name }}<div>
+                                                    <div class="text-xs text-slate-400">Arrived 10 mins ago</div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-500 font-mono">{{ $patient->patient_code }}</td>
+                                        <td class="px-6 py-4 text-slate-500">{{ $patient->department }}</td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="px-2 py-1 rounded bg-rose-50 text-rose-600 text-[10px] font-bold uppercase">{{ $patient->status }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            @endforeach
+                        @endempty
+                        <tbody class="text-sm divide-y divide-slate-100">
+                            <tr>
+                                <td class="px-6 py-4 text-slate-500">No Patient Found!</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            <th class="px-6 py-3 border-b border-slate-100">Patient</th>
-                            <th class="px-6 py-3 border-b border-slate-100">ID</th>
-                            <th class="px-6 py-3 border-b border-slate-100">Dept</th>
-                            <th class="px-6 py-3 border-b border-slate-100">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm divide-y divide-slate-100">
-                        <tr>
-                            <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700 text-sm">Johnathan Doe</div>
-                                <div class="text-xs text-slate-400">Arrived 10 mins ago</div>
-                            </td>
-                            <td class="px-6 py-4 text-slate-500 font-mono">#NS-8820</td>
-                            <td class="px-6 py-4 text-slate-500">Emergency</td>
-                            <td class="px-6 py-4">
-                                <span
-                                    class="px-2 py-1 rounded bg-rose-50 text-rose-600 text-[10px] font-bold uppercase">Critical</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700 text-sm">Sarah Elizabeth</div>
-                                <div class="text-xs text-slate-400">Arrived 2 hrs ago</div>
-                            </td>
-                            <td class="px-6 py-4 text-slate-500 font-mono">#NS-8819</td>
-                            <td class="px-6 py-4 text-slate-500">Cardiology</td>
-                            <td class="px-6 py-4">
-                                <span
-                                    class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase">Stable</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
-        </div>
-
+        @endcan
         <!-- Right Side: Sidebar Widgets -->
         <div class="space-y-6">
             <!-- Notices Widget -->

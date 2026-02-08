@@ -51,8 +51,8 @@ class User extends Authenticatable
     /**
      * Override Laravel can() to use permissions
      */
-    public function can($ability, $arguments = []): bool
-    {
-        return $this->hasPermission($ability);
-    }
+    // public function can($ability, $arguments = []): bool
+    // {
+    //     return $this->hasPermission($ability);
+    // }
 }

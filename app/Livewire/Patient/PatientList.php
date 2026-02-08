@@ -17,7 +17,7 @@ class PatientList extends Component
 
     public function render()
     {
-        return view('livewire.patient.patient-list', [
+        return view('livewire.patients.patient-list', [
             'patients' => Patient::latest()->paginate(10),
         ])->layout('layouts.app');
     }
