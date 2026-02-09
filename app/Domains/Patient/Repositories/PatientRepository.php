@@ -57,4 +57,8 @@ class PatientRepository
 
         return Patient::where('national_id', $nationalId)->exists();
     }
+    public function getRecent(int $limit = 5)
+    {
+        return Patient::latest()->limit($limit)->get();
+    }
 }

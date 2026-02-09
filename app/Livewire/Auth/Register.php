@@ -3,7 +3,8 @@
 namespace App\Livewire\Auth;
 
 use Livewire\Component;
-use Illuminate\Support\Facades\Http;
+use App\Domains\Auth\Services\AuthService;
+use Illuminate\Validation\ValidationException;
 
 class Register extends Component
 {
@@ -14,40 +15,37 @@ class Register extends Component
 
     protected array $rules = [
         'name'     => 'required|string|max:255',
-        'email'    => 'required|email',
+        'email'    => 'required|email|unique:users,email',
         'password' => 'required|min:8',
-        'role'     => 'required',
+        'role'     => 'required|exists:roles,name',
     ];
 
-    public function submit()
+    public function submit(AuthService $authService)
     {
         $this->validate();
 
-        $response = Http::withToken(session('api_token'))
-            ->post(url('/api/auth/register'), [
+        try {
+            $authService->register([
                 'name'     => $this->name,
                 'email'    => $this->email,
                 'password' => $this->password,
                 'role'     => $this->role,
             ]);
-        if ($response->failed()) {
-            $data = json_decode($response->body(), true);
-            $message = isset($data['message']) ? $data['message'] : 'Registration failed';
-            $this->addError('email', $message);
-            return;
-        }
-        $this->dispatch(
-            'notify',
-            type: 'success',
-            message: 'Staff registered successfully'
-        );
 
-        $this->reset(['name', 'email', 'password', 'role']);
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Staff registered successfully'
+            );
+
+            $this->reset(['name', 'email', 'password', 'role']);
+        } catch (\Exception $e) {
+            $this->addError('email', 'An error occurred during registration.');
+        }
     }
 
     public function render()
     {
-        return view('livewire.auth.register')
-            ->layout('layouts.app');
+        return view('livewire.auth.register')->layout('layouts.app');
     }
 }

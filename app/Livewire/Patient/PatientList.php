@@ -3,22 +3,29 @@
 namespace App\Livewire\Patient;
 
 use Livewire\Component;
-use App\Domains\Patient\Models\Patient;
+use Livewire\WithPagination;
+use App\Domains\Patient\Repositories\PatientRepository;
 
 class PatientList extends Component
 {
+    use WithPagination;
+    
+    public $search = '';
+    public $status = '';
+
     public function mount()
     {
-        abort_unless(
-            auth()->user()->can('patient.view'),
-            403
-        );
+        abort_unless(auth()->user()->can('patient.view'), 403);
     }
 
-    public function render()
+    public function render(PatientRepository $repository)
     {
-        return view('livewire.patients.patient-list', [
-            'patients' => Patient::latest()->paginate(10),
+        return view('livewire.patient.patient-list', [
+            'patients' => $repository->paginate(
+                perPage: 10,
+                search: $this->search,
+                status: $this->status
+            ),
         ])->layout('layouts.app');
     }
 }

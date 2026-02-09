@@ -7,7 +7,7 @@
         </div>
 
         @can('patient.create')
-            <a href="{{ route('patients.create') }}"
+            <a href="{{ route('patient.create') }}"
                 class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/10">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -26,8 +26,12 @@
                         class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
                         <th class="px-6 py-4">Patient Information</th>
                         <th class="px-6 py-4">Contact Details</th>
+                        <th class="px-6 py-4">Dept</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4 text-right">Actions</th>
+                        <th class="px-6 py-4">Gender</th>
+                        @can('patient.update')
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
@@ -42,7 +46,7 @@
                                     <div>
                                         <div class="font-bold text-slate-700">{{ $patient->full_name }}</div>
                                         <div class="text-[11px] text-slate-400 font-mono">ID:
-                                            #P-{{ str_pad($patient->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                            {{ $patient->patient_code }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -58,13 +62,24 @@
                             </td>
                             <td class="px-6 py-4 text-slate-500">
                                 <span
-                                    class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase">Active</span>
+                                    class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase">{{ $patient->departement ?? 'N/A' }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                <span
+                                    class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase">{{ $patient->gender }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                <span
+                                    class="px-2 py-1 rounded text-[10px] font-bold uppercase 
+                                    {{ $patient->status === 'active' ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600' }}">
+                                    {{ $patient->status }}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <div
-                                    class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    class="flex justify-end gap-2 opacity-100 group-hover:opacity-100 transition-opacity">
                                     @can('patient.update')
-                                        <a href="{{ route('patients.edit', $patient->id) }}"
+                                        <a href="{{ route('patient.edit', $patient->id) }}"
                                             class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Edit Patient">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +91,7 @@
 
                                     @can('patient.delete')
                                         <button
-                                            class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                             title="Delete Patient">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

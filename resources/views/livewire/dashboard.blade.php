@@ -69,44 +69,50 @@
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                         <h2 class="font-bold text-slate-800 tracking-tight">Recent Patient Admissions</h2>
-                        <button class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All</button>
+                        <a href="{{ route('patients') }}"
+                            class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All</a>
                     </div>
+
                     <table class="w-full text-left border-collapse">
-                        @empty($recentPatients)
-                            @foreach ($recentPatients as $patient)
-                                <thead>
-                                    <tr class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        <th class="px-6 py-3 border-b border-slate-100">Patient</th>
-                                        <th class="px-6 py-3 border-b border-slate-100">ID</th>
-                                        <th class="px-6 py-3 border-b border-slate-100">Dept</th>
-                                        <th class="px-6 py-3 border-b border-slate-100">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm divide-y divide-slate-100">
-                                    <tr>
-                                        <td class="px-6 py-4">
-                                            <div class="font-semibold text-slate-700 text-sm">{{ $patient->full_name }}<div>
-                                                    <div class="text-xs text-slate-400">Arrived 10 mins ago</div>
-                                        </td>
-                                        <td class="px-6 py-4 text-slate-500 font-mono">{{ $patient->patient_code }}</td>
-                                        <td class="px-6 py-4 text-slate-500">{{ $patient->department }}</td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="px-2 py-1 rounded bg-rose-50 text-rose-600 text-[10px] font-bold uppercase">{{ $patient->status }}</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            @endforeach
-                        @endempty
-                        <tbody class="text-sm divide-y divide-slate-100">
-                            <tr>
-                                <td class="px-6 py-4 text-slate-500">No Patient Found!</td>
+                        <thead>
+                            <tr class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <th class="px-6 py-3 border-b border-slate-100">Patient</th>
+                                <th class="px-6 py-3 border-b border-slate-100">ID</th>
+                                <th class="px-6 py-3 border-b border-slate-100">Dept</th>
+                                <th class="px-6 py-3 border-b border-slate-100">Status</th>
                             </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100">
+                            @forelse ($recentPatients as $patient)
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="font-semibold text-slate-700 text-sm">{{ $patient->full_name }}</div>
+                                        <div class="text-xs text-slate-400">{{ $patient->created_at->diffForHumans() }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-500 font-mono">{{ $patient->patient_code }}</td>
+                                    <td class="px-6 py-4 text-slate-500">{{ $patient->department ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4">
+                                        <span
+                                            class="px-2 py-1 rounded text-[10px] font-bold uppercase 
+                                    {{ $patient->status === 'active' ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600' }}">
+                                            {{ $patient->status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-slate-400">
+                                        No Patient Found!
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
         @endcan
+
         <!-- Right Side: Sidebar Widgets -->
         <div class="space-y-6">
             <!-- Notices Widget -->

@@ -7,6 +7,7 @@ use App\Domains\Auth\Models\Role;
 use App\Domains\Auth\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Domains\Auth\Services\AuthService;
 
 class AuthController extends Controller
 {
@@ -44,10 +45,8 @@ class AuthController extends Controller
         return response()->json($request->user());
     }
 
-    public function register(Request $request)
+    public function register(Request $request, AuthService $authService)
     {
-        // $this->authorize('create', User::class);
-
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
@@ -55,14 +54,7 @@ class AuthController extends Controller
             'role'     => 'required|exists:roles,name',
         ]);
 
-        $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        $role = Role::where('name', $validated['role'])->first();
-        $user->roles()->attach($role);
+        $user = $authService->register($validated);
 
         return response()->json([
             'message' => 'Staff registered successfully',
@@ -70,7 +62,7 @@ class AuthController extends Controller
                 'id'    => $user->id,
                 'name'  => $user->name,
                 'email' => $user->email,
-                'role'  => $role->name,
+                'role'  => $validated['role'],
             ],
         ], 201);
     }
