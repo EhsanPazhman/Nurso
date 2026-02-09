@@ -27,8 +27,8 @@
                         <th class="px-6 py-4">Patient Information</th>
                         <th class="px-6 py-4">Contact Details</th>
                         <th class="px-6 py-4">Dept</th>
-                        <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4">Gender</th>
+                        <th class="px-6 py-4">Status</th>
                         @can('patient.update')
                             <th class="px-6 py-4 text-right">Actions</th>
                         @endcan

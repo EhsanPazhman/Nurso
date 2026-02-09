@@ -14,10 +14,18 @@ class Dashboard extends Component
 
     public function render(PatientRepository $repository)
     {
+        $user = auth()->user();
+
         return view('livewire.dashboard', [
-            'recentPatients' => auth()->user()->can('patient.view')
-                ? $repository->getRecent(5)
-                : collect(),
+            'totalPatients' => $repository->getTotalCount(),
+            'todayAdmissions' => $repository->getTodayAdmissionsCount(),
+
+            'activeDoctorsCount' => \App\Domains\Auth\Models\User::where('is_active', 1)
+                ->whereHas('roles', fn($q) => $q->where('name', 'doctor'))->count(),
+
+            'recentPatients' => $user->can('patient.view') ? $repository->getRecent(6) : collect(),
+
+            'occupancyRate' => 75,
         ])->layout('layouts.app');
     }
 }

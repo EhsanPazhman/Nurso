@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domains\Auth\Models;
+
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,8 +35,12 @@ class User extends Authenticatable
 
     // ---------------- Permissions Logic ----------------
 
-    public function hasRole(string $role): bool
+    public function hasRole($role): bool
     {
+        if (is_array($role)) {
+            return $this->roles()->whereIn('name', $role)->exists();
+        }
+
         return $this->roles()->where('name', $role)->exists();
     }
 
@@ -47,12 +52,4 @@ class User extends Authenticatable
             })
             ->exists();
     }
-
-    /**
-     * Override Laravel can() to use permissions
-     */
-    // public function can($ability, $arguments = []): bool
-    // {
-    //     return $this->hasPermission($ability);
-    // }
 }

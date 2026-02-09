@@ -87,9 +87,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">Primary
-                            Phone</label>
+                            Phone <span class="text-red-500">*</span></label>
                         <input type="text" wire:model="phone" placeholder="+93 --- --- ---"
-                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-blue-600 outline-none transition-all">
+                            class="w-full px-4 py-2.5 bg-slate-50 border @error('last_name') @else border-slate-200 @enderror rounded-lg focus:border-blue-600 outline-none transition-all">
+                        @error('phone')
+                            <p class="text-[10px] text-red-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">Secondary

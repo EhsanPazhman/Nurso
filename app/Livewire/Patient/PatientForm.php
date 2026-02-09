@@ -4,13 +4,13 @@ namespace App\Livewire\Patient;
 
 use Livewire\Component;
 use App\Domains\Patient\Models\Patient;
+use App\Domains\Patient\Services\PatientService;
 use Illuminate\Support\Facades\Auth;
 
 class PatientForm extends Component
 {
     public ?Patient $patient = null;
 
-    // Define all fields as public properties so Livewire can bind to them
     public $first_name, $last_name, $father_name, $gender = 'male';
     public $date_of_birth, $phone, $secondary_phone, $national_id;
     public $address, $status = 'active';
@@ -20,8 +20,6 @@ class PatientForm extends Component
         if ($patientId) {
             abort_unless(Auth::user()->can('patient.update'), 403);
             $this->patient = Patient::findOrFail($patientId);
-
-            // Fill properties with existing data for editing
             $this->fill($this->patient->toArray());
         } else {
             abort_unless(Auth::user()->can('patient.create'), 403);
@@ -44,26 +42,36 @@ class PatientForm extends Component
         ];
     }
 
-    public function save()
+    public function save(PatientService $service)
     {
         $validatedData = $this->validate();
 
-        if ($this->patient) {
-            // Add who updated it
-            $validatedData['updated_by'] = Auth::id();
+        try {
+            if ($this->patient) {
+                $validatedData['updated_by'] = Auth::id();
+                $service->update($this->patient, $validatedData);
 
-            $this->patient->update($validatedData);
-            session()->flash('success', 'Patient updated successfully');
-        } else {
-            // Add required system fields for new records
-            $validatedData['created_by'] = Auth::id();
-            $validatedData['patient_code'] = 'PAT-' . strtoupper(uniqid()); // Example auto-code
+                $this->dispatch(
+                    'notify',
+                    type: 'success',
+                    message: 'Patient updated successfully'
+                );
+            } else {
+                $validatedData['created_by'] = Auth::id();
+                $service->create($validatedData);
 
-            Patient::create($validatedData);
-            session()->flash('success', 'Patient created successfully');
+                $this->dispatch(
+                    'notify',
+                    type: 'success',
+                    message: 'Patient created successfully'
+                );
+            }
+
+        } catch (\DomainException $e) {
+            $this->addError('national_id', $e->getMessage());
+        } catch (\Exception $e) {
+            session()->flash('error', 'Something went wrong. Please try again.');
         }
-
-        return redirect()->route('patients');
     }
 
     public function render()

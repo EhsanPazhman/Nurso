@@ -61,4 +61,13 @@ class PatientRepository
     {
         return Patient::latest()->limit($limit)->get();
     }
+    public function getTotalCount(): int
+    {
+        return Patient::count();
+    }
+
+    public function getTodayAdmissionsCount(): int
+    {
+        return Patient::whereDate('created_at', now()->today())->count();
+    }
 }
