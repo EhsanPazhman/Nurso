@@ -31,7 +31,7 @@ class PatientForm extends Component
         return [
             'first_name'      => 'required|string|max:255',
             'last_name'       => 'required|string|max:255',
-            'father_name'     => 'nullable|string|max:255',
+            'father_name'     => 'required|string|max:255',
             'gender'          => 'required|in:male,female',
             'date_of_birth'   => 'nullable|date',
             'phone'           => 'required|string|max:20',

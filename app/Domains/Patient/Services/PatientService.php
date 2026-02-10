@@ -73,7 +73,7 @@ class PatientService
     public function delete(Patient $patient): void
     {
         DB::transaction(function () use ($patient) {
-
+            $patient->update(['status' => 'inactive']);
             $this->repository->delete($patient);
 
             activity('patient')

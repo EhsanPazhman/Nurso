@@ -7,17 +7,36 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PatientRepository
 {
-    public function paginate(
-        int $perPage = 15,
-        ?string $search = null,
-        ?string $status = null
-    ): LengthAwarePaginator {
-        return Patient::query()
-            ->search($search)
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->latest()
-            ->paginate($perPage);
+    protected $model;
+
+    public function __construct(Patient $model)
+    {
+        $this->model = $model;
     }
+
+    public function paginate(int $perPage = 10, string $search = '', string $status = '', bool $onlyTrashed = false)
+    {
+        $query = $this->model::query();
+
+        if ($onlyTrashed) {
+            $query->onlyTrashed();
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('patient_code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
+
 
     public function findById(int $id): Patient
     {
