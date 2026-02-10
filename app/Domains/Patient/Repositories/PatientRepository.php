@@ -89,4 +89,8 @@ class PatientRepository
     {
         return Patient::whereDate('created_at', now()->today())->count();
     }
+    public function updateStatus(Patient $patient, string $status): bool
+    {
+        return $patient->update(['status' => $status]);
+    }
 }

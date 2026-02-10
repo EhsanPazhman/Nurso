@@ -85,19 +85,51 @@
 
                             <!-- Status -->
                             <td class="px-6 py-4">
-                                @php
-                                    $statusClasses = [
-                                        'active' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
-                                        'inactive' => 'bg-amber-50 text-amber-600 border-amber-100',
-                                        'deceased' => 'bg-slate-900 text-white border-slate-900',
-                                    ];
-                                @endphp
-                                <span
-                                    class="px-2.5 py-1 border rounded-full text-[10px] font-bold uppercase {{ $statusClasses[$patient->status] ?? 'bg-slate-50 text-slate-600 border-slate-100' }}">
-                                    {{ $patient->status }}
-                                </span>
-                            </td>
+                                <div class="flex items-center gap-2">
+                                    @php
+                                        $statusClasses = [
+                                            'active' => 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                                            'inactive' => 'bg-amber-50 text-amber-600 border-amber-100',
+                                            'deceased' => 'bg-slate-900 text-white border-slate-900',
+                                        ];
+                                    @endphp
 
+                                    <span
+                                        class="px-2.5 py-1 border rounded-full text-[10px] font-bold uppercase {{ $statusClasses[$patient->status] ?? 'bg-slate-50 text-slate-600 border-slate-100' }}">
+                                        {{ $patient->status }}
+                                    </span>
+
+                                    {{-- تغییر وضعیت فقط برای بیماران حذف نشده --}}
+                                    @if (!$showTrashed)
+                                        <div x-data="{ open: false }" class="relative">
+                                            <button @click="open = !open"
+                                                class="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+
+                                            <div x-show="open" @click.away="open = false" x-cloak
+                                                class="absolute left-0 mt-2 w-32 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                                                <button wire:click="changeStatus({{ $patient->id }}, 'active')"
+                                                    @click="open = false"
+                                                    class="w-full text-left px-4 py-2 text-[10px] font-bold text-emerald-600 hover:bg-emerald-50 border-b border-slate-50">SET
+                                                    ACTIVE</button>
+                                                <button wire:click="changeStatus({{ $patient->id }}, 'inactive')"
+                                                    @click="open = false"
+                                                    class="w-full text-left px-4 py-2 text-[10px] font-bold text-amber-600 hover:bg-amber-50 border-b border-slate-50">SET
+                                                    INACTIVE</button>
+                                                <button wire:click="changeStatus({{ $patient->id }}, 'deceased')"
+                                                    @click="open = false"
+                                                    class="w-full text-left px-4 py-2 text-[10px] font-bold text-slate-700 hover:bg-slate-100">SET
+                                                    DECEASED</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
                             <!-- Actions -->
                             <td class="px-6 py-4">
                                 <div class="flex justify-end gap-1">

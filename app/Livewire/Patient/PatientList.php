@@ -29,6 +29,13 @@ class PatientList extends Component
         $this->dispatch('notify', message: 'Patient moved to trash', type: 'success');
     }
 
+    public function changeStatus($id, $status, PatientService $service)
+    {
+        $patient = Patient::findOrFail($id);
+        $service->changeStatus($patient, $status);
+        $this->dispatch('notify', message: 'Status updated', type: 'success');
+    }
+
     public function restorePatient($id, PatientService $service)
     {
         $service->restore($id);
@@ -41,7 +48,7 @@ class PatientList extends Component
                 perPage: 10,
                 search: $this->search,
                 status: $this->status,
-                onlyTrashed: $this->showTrashed 
+                onlyTrashed: $this->showTrashed
             ),
         ])->layout('layouts.app');
     }

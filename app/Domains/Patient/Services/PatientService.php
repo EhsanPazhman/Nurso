@@ -6,6 +6,7 @@ use App\Domains\Patient\Repositories\PatientRepository;
 use App\Domains\Patient\Models\Patient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PatientService
 {
@@ -31,7 +32,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($patient)
-                ->causedBy(auth()->guard()->user())
+                ->causedBy(auth::user())
                 ->withProperties(['patient_code' => $patient->patient_code])
                 ->log('Patient created');
 
@@ -59,7 +60,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($updatedPatient)
-                ->causedBy(auth()->guard()->user())
+                ->causedBy(auth::user())
                 ->log('Patient updated');
 
             return $updatedPatient;
@@ -78,7 +79,7 @@ class PatientService
 
             activity('patient')
                 ->performedOn($patient)
-                ->causedBy(auth()->guard()->user())
+                ->causedBy(auth::user())
                 ->log('Patient deleted');
         });
     }
@@ -93,7 +94,7 @@ class PatientService
 
         activity('patient')
             ->performedOn($patient)
-            ->causedBy(auth()->guard()->user())
+            ->causedBy(auth::user())
             ->log('Patient restored');
 
         return $patient;
@@ -116,5 +117,17 @@ class PatientService
             : 1;
 
         return sprintf('PT-%s-%06d', $year, $nextNumber);
+    }
+
+    public function changeStatus(Patient $patient, string $status): void
+    {
+        DB::transaction(function () use ($patient, $status) {
+            $this->repository->updateStatus($patient, $status);
+
+            activity('patient')
+                ->performedOn($patient)
+                ->causedBy(auth::user())
+                ->log("Status changed to {$status}");
+        });
     }
 }
