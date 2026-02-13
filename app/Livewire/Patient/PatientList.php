@@ -14,13 +14,22 @@ class PatientList extends Component
 
     public $search = '';
     public $status = '';
+    public bool $showTrashed = false;
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatus()
+    {
+        $this->resetPage();
+    }
 
     public function mount()
     {
         abort_unless(auth()->user()->can('patient.view'), 403);
     }
-
-    public bool $showTrashed = false;
 
     public function deletePatient($id, PatientService $service)
     {

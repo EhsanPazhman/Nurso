@@ -17,14 +17,48 @@
             </a>
         @endcan
     </div>
-    <button wire:click="$set('showTrashed', {{ $showTrashed ? 'false' : 'true' }})"
-        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all {{ $showTrashed ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-        {{ $showTrashed ? 'Back to All Patients' : 'View Trash Bin' }}
-    </button>
+    <!-- 2. Search & Filter Bar -->
+    <div
+        class="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+
+        <div class="flex flex-1 flex-col md:flex-row gap-4 w-full">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input wire:model.live.debounce.300ms="search" type="text"
+                    placeholder="Search by Name, Father, Code or Phone..."
+                    class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all">
+            </div>
+
+            <!-- Status Filter (Hidden when in Trash) -->
+            @if (!$showTrashed)
+                <div class="w-full md:w-48">
+                    <select wire:model.live="status"
+                        class="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all cursor-pointer">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="deceased">Deceased</option>
+                    </select>
+                </div>
+            @endif
+        </div>
+
+        <!-- Trash Toggle Button -->
+        <button wire:click="$set('showTrashed', {{ $showTrashed ? 'false' : 'true' }})"
+            class="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all border {{ $showTrashed ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100' }} cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            {{ $showTrashed ? 'BACK TO REGISTRY' : 'VIEW TRASH' }}
+        </button>
+    </div>
     <!-- 2. Table Section -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">

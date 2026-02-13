@@ -26,16 +26,19 @@ class PatientRepository
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('father_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('patient_code', 'like', "%{$search}%");
             });
         }
 
-        if ($status) {
+        if ($status && !$onlyTrashed) {
             $query->where('status', $status);
         }
 
         return $query->latest()->paginate($perPage);
     }
+
 
 
     public function findById(int $id): Patient
