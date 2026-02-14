@@ -17,29 +17,29 @@ class PatientRepository
     public function paginate(int $perPage = 10, string $search = '', string $status = '', bool $onlyTrashed = false)
     {
         $query = $this->model::query();
+        $user = auth()->user();
 
-        if ($onlyTrashed) {
-            $query->onlyTrashed();
+        if ($user->hasRole('doctor')) {
+            $query->where('doctor_id', $user->id);
+        } elseif ($user->hasRole('nurse')) {
+            $query->where('department_id', $user->department_id);
         }
+
+        if ($onlyTrashed) $query->onlyTrashed();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('father_name', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('patient_code', 'like', "%{$search}%");
             });
         }
 
-        if ($status && !$onlyTrashed) {
-            $query->where('status', $status);
-        }
+        if ($status && !$onlyTrashed) $query->where('status', $status);
 
-        return $query->latest()->paginate($perPage);
+        return $query->with(['department', 'doctor'])->latest()->paginate($perPage);
     }
-
-
 
     public function findById(int $id): Patient
     {

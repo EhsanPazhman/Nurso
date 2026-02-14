@@ -2,8 +2,11 @@
 
 namespace App\Domains\Auth\Models;
 
+use App\Domains\Auth\Models\Role;
 use Laravel\Sanctum\HasApiTokens;
+use App\Domains\Patient\Models\Patient;
 use Illuminate\Notifications\Notifiable;
+use App\Domains\Department\Models\Department;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -31,6 +34,16 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function patients()
+    {
+        return $this->hasMany(Patient::class, 'doctor_id');
     }
 
     // ---------------- Permissions Logic ----------------

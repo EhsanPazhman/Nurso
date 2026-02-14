@@ -30,6 +30,8 @@ return new class extends Migration {
             $table->enum('status', ['active', 'inactive', 'deceased'])
                 ->default('active');
 
+            $table->foreignId('department_id')->nullable()->after('id')->constrained('departments');
+            $table->foreignId('doctor_id')->nullable()->after('department_id')->constrained('users');
             $table->foreignId('created_by')->nullable();
             $table->foreignId('updated_by')->nullable();
 
