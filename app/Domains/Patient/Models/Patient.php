@@ -29,10 +29,14 @@ class Patient extends Model
         'status',
         'created_by',
         'updated_by',
+        'department_id', 
+        'doctor_id',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'department_id' => 'integer',
+        'doctor_id' => 'integer',
         'deleted_at'    => 'datetime',
     ];
 
