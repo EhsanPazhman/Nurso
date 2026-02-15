@@ -14,8 +14,18 @@ class PatientList extends Component
 
     public $search = '';
     public $status = '';
+    public $fromDate;
+    public $toDate;
     public bool $showTrashed = false;
 
+    public function updatingFromDate()
+    {
+        $this->resetPage();
+    }
+    public function updatingToDate()
+    {
+        $this->resetPage();
+    }
     public function updatingSearch()
     {
         $this->resetPage();
@@ -57,7 +67,9 @@ class PatientList extends Component
                 perPage: 10,
                 search: $this->search,
                 status: $this->status,
-                onlyTrashed: $this->showTrashed
+                onlyTrashed: $this->showTrashed,
+                fromDate: $this->fromDate, 
+                toDate: $this->toDate
             ),
         ])->layout('layouts.app');
     }

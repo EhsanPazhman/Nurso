@@ -14,7 +14,7 @@ class PatientRepository
         $this->model = $model;
     }
 
-    public function paginate(int $perPage = 10, string $search = '', string $status = '', bool $onlyTrashed = false)
+    public function paginate(int $perPage = 10, string $search = '', string $status = '', bool $onlyTrashed = false, $fromDate = null, $toDate = null)
     {
         $query = $this->model::query();
         $user = auth()->user();
@@ -23,6 +23,10 @@ class PatientRepository
             $query->where('doctor_id', $user->id);
         } elseif ($user->hasRole('nurse')) {
             $query->where('department_id', $user->department_id);
+        }
+
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
         }
 
         if ($onlyTrashed) $query->onlyTrashed();
@@ -50,7 +54,7 @@ class PatientRepository
     {
         return Patient::create($data);
     }
-
+    
     public function update(Patient $patient, array $data): Patient
     {
         $patient->update($data);

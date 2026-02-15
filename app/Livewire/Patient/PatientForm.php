@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Livewire\Patient;
+namespace App\Livewire\Patient; 
 
 use Livewire\Component;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
+use App\Domains\Department\Models\Department;
+use App\Domains\Auth\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PatientForm extends Component
@@ -14,6 +16,7 @@ class PatientForm extends Component
     public $first_name, $last_name, $father_name, $gender = 'male';
     public $date_of_birth, $phone, $secondary_phone, $national_id;
     public $address, $status = 'active';
+    public $department_id, $doctor_id;
 
     public function mount(?int $patientId = null)
     {
@@ -39,6 +42,8 @@ class PatientForm extends Component
             'national_id'     => 'nullable|string|max:20',
             'address'         => 'nullable|string',
             'status'          => 'required|in:active,inactive,deceased',
+            'department_id'   => 'required|exists:departments,id', // Mandatory for isolation
+            'doctor_id'       => 'nullable|exists:users,id',
         ];
     }
 
@@ -50,23 +55,15 @@ class PatientForm extends Component
             if ($this->patient) {
                 $validatedData['updated_by'] = Auth::id();
                 $service->update($this->patient, $validatedData);
-
-                $this->dispatch(
-                    'notify',
-                    type: 'success',
-                    message: 'Patient updated successfully'
-                );
+                $msg = 'Patient updated successfully';
             } else {
                 $validatedData['created_by'] = Auth::id();
                 $service->create($validatedData);
-
-                $this->dispatch(
-                    'notify',
-                    type: 'success',
-                    message: 'Patient created successfully'
-                );
+                $msg = 'Patient registered successfully';
             }
 
+            $this->dispatch('notify', type: 'success', message: $msg);
+            return $this->redirectRoute('patients', navigate: true);
         } catch (\DomainException $e) {
             $this->addError('national_id', $e->getMessage());
         } catch (\Exception $e) {
@@ -76,7 +73,9 @@ class PatientForm extends Component
 
     public function render()
     {
-        return view('livewire.patient.patient-form')
-            ->layout('layouts.app');
+        return view('livewire.patient.patient-form', [
+            'departments' => Department::where('is_active', true)->get(),
+            'doctors' => User::whereHas('roles', fn($q) => $q->where('name', 'doctor'))->get(),
+        ])->layout('layouts.app');
     }
 }

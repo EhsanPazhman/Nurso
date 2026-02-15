@@ -58,6 +58,13 @@
             </svg>
             {{ $showTrashed ? 'BACK TO REGISTRY' : 'VIEW TRASH' }}
         </button>
+        <div class="flex gap-2">
+            <input type="date" wire:model.live="fromDate"
+                class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+            <input type="date" wire:model.live="toDate"
+                class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+        </div>
+
     </div>
     <!-- 2. Table Section -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">

@@ -20,6 +20,46 @@
     <!-- Form Card -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <form wire:submit.prevent="save" class="p-8 space-y-8">
+            <!-- Section 0: Clinical Assignment -->
+            <div class="space-y-6 mb-10">
+                <h3
+                    class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.2em] border-b border-slate-100 pb-3">
+                    Clinical Assignment
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Department Select -->
+                    <div class="space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">Target
+                            Department <span class="text-red-500">*</span></label>
+                        <select wire:model="department_id"
+                            class="w-full px-4 py-2.5 bg-slate-50 border @error('department_id') @else border-slate-200 @enderror rounded-xl focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all cursor-pointer">
+                            <option value="">-- Choose Department --</option>
+                            @foreach ($departments as $dept)
+                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('department_id')
+                            <p class="text-[10px] text-red-600 font-bold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Doctor Select -->
+                    <div class="space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">Attending
+                            Physician</label>
+                        <select wire:model="doctor_id"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all cursor-pointer">
+                            <option value="">-- Optional: Select Doctor --</option>
+                            @foreach ($doctors as $doc)
+                                <option value="{{ $doc->id }}">{{ $doc->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('doctor_id')
+                            <p class="text-[10px] text-red-600 font-bold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
 
             <!-- Section 1: Basic Information -->
             <div class="space-y-6">

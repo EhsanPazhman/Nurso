@@ -59,7 +59,7 @@
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('patients.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Patients</span>
                 </a>
@@ -74,6 +74,18 @@
                 <span x-show="isSidebarExpanded" x-cloak x-transition.opacity
                     class="whitespace-nowrap">Appointments</span>
             </a>
+
+            @can('user.create')
+                <a href="{{ route('staff.register') }}" wire:navigate
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors group">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Register
+                        Staff</span>
+                </a>
+            @endcan
 
             <div class="pt-10">
                 <form method="POST" action="{{ route('logout') }}" id="logout-form" class="hidden">
@@ -126,8 +138,9 @@
             <div class="flex items-center gap-4">
                 <button @click="isSidebarExpanded = !isSidebarExpanded"
                     class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors focus:outline-none cursor-pointer">
-                    <svg class="w-6 h-6 transition-transform duration-300" :class="{ 'rotate-180': !isSidebarExpanded }"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 transition-transform duration-300"
+                        :class="{ 'rotate-180': !isSidebarExpanded }" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                     </svg>

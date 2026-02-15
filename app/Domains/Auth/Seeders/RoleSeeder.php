@@ -12,58 +12,62 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             'super_admin' => [
-                'label' => 'Super Admin',
-                'permissions' => Permission::pluck('id')->toArray(),
+                'label' => 'System Owner',
+                'permissions' => Permission::pluck('name')->toArray(),
             ],
 
             'hospital_admin' => [
-                'label' => 'Hospital Admin',
+                'label' => 'Hospital Administrator',
                 'permissions' => [
                     'patient.view',
                     'patient.create',
                     'patient.update',
                     'patient.delete',
+                    'user.view',
+                    'user.create',
+                    'user.update',
+                    'user.delete',
+                    'facility.manage'
                 ],
             ],
 
             'reception' => [
-                'label' => 'Reception',
+                'label' => 'Medical Receptionist',
                 'permissions' => [
                     'patient.view',
                     'patient.create',
+                    'patient.update'
                 ],
             ],
 
             'doctor' => [
-                'label' => 'Doctor',
+                'label' => 'Attending Physician',
                 'permissions' => [
                     'patient.view',
+                    'patient.update'
                 ],
             ],
 
             'nurse' => [
-                'label' => 'Nurse',
+                'label' => 'Registered Nurse',
                 'permissions' => [
                     'patient.view',
+                    'medical.vitals'
                 ],
             ],
         ];
 
         foreach ($roles as $name => $data) {
-            $role = Role::firstOrCreate(
+            $role = Role::updateOrCreate(
                 ['name' => $name],
                 ['label' => $data['label']]
             );
 
-            if ($name === 'super_admin') {
-                $role->permissions()->sync($data['permissions']);
-            } else {
-                $permissionIds = Permission::whereIn('name', $data['permissions'])
-                    ->pluck('id')
-                    ->toArray();
+            $permissionIds = Permission::whereIn('name', $data['permissions'])
+                ->pluck('id')
+                ->toArray();
 
-                $role->permissions()->sync($permissionIds);
-            }
+            $role->permissions()->sync($permissionIds);
         }
     }
 }
