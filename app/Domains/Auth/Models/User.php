@@ -7,11 +7,12 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Domains\Patient\Models\Patient;
 use Illuminate\Notifications\Notifiable;
 use App\Domains\Department\Models\Department;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',

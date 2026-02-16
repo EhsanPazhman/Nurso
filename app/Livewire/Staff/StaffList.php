@@ -24,11 +24,17 @@ class StaffList extends Component
         $user->update(['is_active' => !$user->is_active]);
         $this->dispatch('notify', type: 'success', message: 'Staff status updated.');
     }
+    public function deleteStaff($userId)
+    {
+        $user = User::findOrFail($userId);
+        $user->delete(); // This triggers SoftDelete
 
+        $this->dispatch('notify', type: 'success', message: 'Staff member moved to trash.');
+    }
     public function render()
     {
         $staff = User::with(['roles', 'department'])
-            ->where('id', '!=', Auth::id()) 
+            ->where('id', '!=', Auth::id())
             ->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
                     ->orWhere('email', 'like', "%{$this->search}%");

@@ -9,6 +9,7 @@ Route::post('/api/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/api/auth/register', [AuthController::class, 'register']);
+    Route::post('/api/auth/register', [AuthController::class, 'register']);
 
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
