@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_active')->default(true);
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

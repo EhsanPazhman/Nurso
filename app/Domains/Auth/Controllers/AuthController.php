@@ -2,68 +2,73 @@
 
 namespace App\Domains\Auth\Controllers;
 
+use DomainException;
 use Illuminate\Http\Request;
-use App\Domains\Auth\Models\Role;
-use App\Domains\Auth\Models\User;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use App\Domains\Auth\Services\AuthService;
+use App\Domains\Auth\Requests\RegisterRequest;
+use App\Domains\Auth\Requests\UpdateStaffRequest;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function __construct(protected AuthService $authService) {}
+
+    public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        try {
+            $user = $this->authService->attemptLogin($request->email, $request->password);
+            $token = $user->createToken('api-token')->plainTextToken;
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+                'status' => 'success',
+                'token'  => $token,
+                'user'   => $user->load('roles'),
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 401);
         }
-
-        if (! $user->is_active) {
-            return response()->json([
-                'message' => 'User is inactive'
-            ], 403);
-        }
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'user'  => $user,
-        ]);
     }
 
-    public function me(Request $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        return response()->json($request->user());
-    }
-
-    public function register(Request $request, AuthService $authService)
-    {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'role'     => 'required|exists:roles,name',
-        ]);
-
-        $user = $authService->register($validated);
+        $user = $this->authService->register($request->validated());
 
         return response()->json([
+            'status'  => 'success',
             'message' => 'Staff registered successfully',
-            'data' => [
-                'id'    => $user->id,
-                'name'  => $user->name,
-                'email' => $user->email,
-                'role'  => $validated['role'],
-            ],
+            'data'    => $user->load('roles'),
         ], 201);
+    }
+
+    public function update(UpdateStaffRequest $request, $id): JsonResponse
+    {
+        $user = $this->authService->updateStaff($id, $request->validated());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $user->load('roles')
+        ]);
+    }
+    public function me(Request $request): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data'   => $request->user()->load(['roles', 'department'])
+        ]);
+    }
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully'
+        ]);
     }
 }

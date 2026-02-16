@@ -3,47 +3,47 @@
 namespace App\Livewire\Staff;
 
 use Livewire\Component;
-use App\Domains\Auth\Models\User;
 use Livewire\WithPagination;
+use App\Domains\Auth\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Domains\Auth\Services\AuthService;
+use App\Domains\Auth\Repositories\AuthRepository;
 
 class StaffList extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public string $search = '';
 
-    public function mount()
-    {
-        abort_unless(Auth::user()->hasRole('super_admin'), 403);
+public function mount(): void
+{
+    $this->authorize('viewAny', User::class);
+}
+
+public function deleteStaff(int $userId, AuthService $authService): void
+{
+    $userToDelete = User::findOrFail($userId);
+    $this->authorize('delete', $userToDelete); 
+
+    try {
+        $authService->deleteStaff($userId);
+        $this->dispatch('notify', type: 'success', message: 'Staff member moved to trash.');
+    } catch (\DomainException $e) {
+        $this->dispatch('notify', type: 'error', message: $e->getMessage());
     }
+}
 
-    public function toggleStatus($userId)
+    public function toggleStatus(int $userId, AuthService $authService): void
     {
-        $user = User::findOrFail($userId);
-        $user->update(['is_active' => !$user->is_active]);
+        $authService->toggleStatus($userId);
         $this->dispatch('notify', type: 'success', message: 'Staff status updated.');
     }
-    public function deleteStaff($userId)
-    {
-        $user = User::findOrFail($userId);
-        $user->delete(); // This triggers SoftDelete
 
-        $this->dispatch('notify', type: 'success', message: 'Staff member moved to trash.');
-    }
-    public function render()
+    public function render(AuthRepository $userRepository)
     {
-        $staff = User::with(['roles', 'department'])
-            ->where('id', '!=', Auth::id())
-            ->where(function ($q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%");
-            })
-            ->latest()
-            ->paginate(10);
-
         return view('livewire.staff.staff-list', [
-            'staffMembers' => $staff
+            // Using Repository instead of direct Model query
+            'staffMembers' => $userRepository->getStaffList($this->search, 10)
         ])->layout('layouts.app');
     }
 }

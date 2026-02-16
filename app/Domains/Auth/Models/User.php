@@ -21,6 +21,8 @@ class User extends Authenticatable
         'password',
         'department_id',
         'is_active',
+        'created_by',
+        'updated_by'
     ];
 
     protected $hidden = [
@@ -31,6 +33,30 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (auth()->check()) {
+                $user->created_by = auth()->id();
+            }
+        });
+
+        static::updating(function ($user) {
+            if (auth()->check()) {
+                $user->updated_by = auth()->id();
+            }
+        });
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by')->withTrashed();
+    }
     // ---------------- Relations ----------------
 
     public function roles()
