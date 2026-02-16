@@ -19,11 +19,10 @@ class AuthService
                 'name'          => $data['name'],
                 'email'         => $data['email'],
                 'password'      => Hash::make($data['password']),
-                'department_id' => $data['department_id'] ?? null, // Added: Core for data isolation
+                'department_id' => $data['department_id'] ?? null, 
                 'is_active'     => true,
             ]);
 
-            // Assign the selected role to the user
             $role = Role::where('name', $data['role'])->first();
             if ($role) {
                 $user->roles()->attach($role);

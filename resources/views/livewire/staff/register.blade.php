@@ -27,7 +27,7 @@
                 @enderror
             </div>
 
-            <!-- Department Assignment (New) -->
+            <!-- Department Assignment -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-2">Assign
                     Department</label>
