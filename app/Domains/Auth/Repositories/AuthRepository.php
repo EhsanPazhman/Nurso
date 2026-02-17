@@ -31,4 +31,15 @@ class AuthRepository
             ->latest()
             ->paginate($perPage);
     }
+    public function getTrashedStaff(string $search = '', int $perPage = 10): LengthAwarePaginator
+    {
+        return User::onlyTrashed()
+            ->with(['roles', 'department'])
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($perPage);
+    }
 }

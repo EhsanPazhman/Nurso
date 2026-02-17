@@ -95,4 +95,10 @@ class AuthService
 
         return $user->delete();
     }
+
+    public function restoreStaff(int $userId): bool
+    {
+        $user = User::withTrashed()->findOrFail($userId);
+        return $user->restore();
+    }
 }
