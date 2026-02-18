@@ -182,9 +182,9 @@
             </div>
         </form>
     </div>
-    @if ($patient)
-        <div class="mt-12">
-            <livewire:patient.patient-timeline :patientId="$patient->id" wire:key="timeline-{{ $patient->id }}" />
+    @if ($patient && $patient->exists)
+        <div class="mt-12 max-w-4xl mx-auto pb-20">
+            <livewire:patient.patient-timeline :patientId="$patient->id" wire:key="patient-timeline-{{ $patient->id }}" />
         </div>
     @endif
 </div>

@@ -92,10 +92,10 @@ class PatientService
     {
         $patient = $this->repository->restore($id);
 
-        activity('patient')
+        activity()
             ->performedOn($patient)
-            ->causedBy(auth::user())
-            ->log('Patient restored');
+            ->causedBy(auth()->user())
+            ->log('restored'); 
 
         return $patient;
     }

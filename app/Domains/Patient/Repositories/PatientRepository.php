@@ -54,7 +54,7 @@ class PatientRepository
     {
         return Patient::create($data);
     }
-    
+
     public function update(Patient $patient, array $data): Patient
     {
         $patient->update($data);
@@ -70,7 +70,13 @@ class PatientRepository
     public function restore(int $id): Patient
     {
         $patient = Patient::withTrashed()->findOrFail($id);
+
+        $patient->disableLogging();
+
         $patient->restore();
+        $patient->update(['status' => 'active']);
+
+        $patient->enableLogging();
 
         return $patient;
     }
