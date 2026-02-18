@@ -54,7 +54,7 @@
                 class="mt-6 px-2 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medical Services
             </p>
 
-            @can('patient.view')
+            @can('viewAny', App\Domains\Patient\Models\Patient::class)
                 <a href="{{ route('patients') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('patients.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@
                     class="whitespace-nowrap">Appointments</span>
             </a>
 
-            @can('user.create')
+            @can('viewAny', \App\Domains\Auth\Models\User::class)
                 <a href="{{ route('staffs') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors group">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,6 @@
                             d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                     </svg>
                 </button>
-                <!-- عنوان صفحه جاری (اختیاری) -->
                 <div class="text-sm font-semibold text-slate-400 uppercase tracking-widest">
                     {{ request()->routeIs('dashboard') ? 'Overview' : 'Medical Registry' }}
                 </div>
@@ -166,8 +165,6 @@
                 </div>
             </div>
         </div>
-
-
         <div class="p-8">
             {{ $slot }}
         </div>

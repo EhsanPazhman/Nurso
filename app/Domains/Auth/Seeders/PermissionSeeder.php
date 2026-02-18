@@ -16,7 +16,11 @@ class PermissionSeeder extends Seeder
             ['name' => 'patient.update', 'label' => 'Update patient profiles'],
             ['name' => 'patient.delete', 'label' => 'Archive/Delete patient records'],
 
-
+            // Staff & System Management
+            ['name' => 'staff.view',   'label' => 'View staff list'],
+            ['name' => 'staff.create', 'label' => 'Register new staff'],
+            ['name' => 'staff.update', 'label' => 'Edit staff details'],
+            ['name' => 'staff.delete', 'label' => 'Terminate staff access'],
 
             // Clinical & Bed Management (For future use)
             ['name' => 'medical.vitals', 'label' => 'Record patient vital signs'],

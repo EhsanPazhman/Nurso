@@ -4,15 +4,17 @@ namespace App\Domains\Patient\Models;
 
 use id;
 use App\Domains\Auth\Models\User;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Activitylog\Traits\LogsActivity;
 use App\Domains\Department\Models\Department;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Patient extends Model
 {
     use SoftDeletes;
-
+    use LogsActivity;
     protected $table = 'patients';
 
     protected $fillable = [
@@ -29,7 +31,7 @@ class Patient extends Model
         'status',
         'created_by',
         'updated_by',
-        'department_id', 
+        'department_id',
         'doctor_id',
     ];
 
@@ -54,6 +56,19 @@ class Patient extends Model
         static::updating(function ($patient) {
             $patient->updated_by = auth()->id();
         });
+    }
+
+    /* =========================
+     |  Activity Log Options
+     | =========================
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['first_name', 'last_name', 'status', 'department_id', 'doctor_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('patient_clinical_audit');
     }
 
     /* =========================

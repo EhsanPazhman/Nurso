@@ -6,8 +6,7 @@
             <p class="text-sm text-slate-500 mt-1">Total registered patients: <span
                     class="font-bold text-slate-700">{{ $patients->total() }}</span></p>
         </div>
-
-        @can('patient.create')
+        @can('create', App\Domains\Patient\Models\Patient::class)
             <a href="{{ route('patient.create') }}" wire:navigate
                 class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

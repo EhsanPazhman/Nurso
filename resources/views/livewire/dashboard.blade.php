@@ -113,7 +113,6 @@
                 </div>
             @endcan
         </div>
-
         <!-- Right: Role-Specific Sidebar -->
         <div class="space-y-6">
             <!-- 1. Urgent Shift Notice (Global) -->

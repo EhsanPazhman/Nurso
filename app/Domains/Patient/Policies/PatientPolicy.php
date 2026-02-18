@@ -7,34 +7,24 @@ use App\Domains\Patient\Models\Patient;
 
 class PatientPolicy
 {
-    /**
-     * Bypass all checks for Super Admin
-     */
-    public function before(User $user)
+    public function viewAny(User $user)
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
+        return $user->hasPermission('patient.view');
     }
 
     /**
-     * Determine if user can view the patient registry list or specific file
+     * Determine if user can view a SPECIFIC patient profile.
      */
     public function view(User $user, Patient $patient)
     {
-        if (!$user->can('patient.view')) return false;
+        if (!$user->hasPermission('patient.view')) return false;
 
-        // Admins and Receptionists have full read access
-        if ($user->hasRole(['hospital_admin', 'reception'])) {
-            return true;
-        }
+        if ($user->hasRole(['hospital_admin', 'reception'])) return true;
 
-        // Doctors see only their assigned patients
         if ($user->hasRole('doctor')) {
             return $user->id === $patient->doctor_id;
         }
 
-        // Nurses see patients within their assigned department
         if ($user->hasRole('nurse')) {
             return $user->department_id === $patient->department_id;
         }

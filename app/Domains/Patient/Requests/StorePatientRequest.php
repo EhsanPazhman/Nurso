@@ -9,8 +9,8 @@ class StorePatientRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->guard->check()
-            && auth()->guard->user()->can('create', Patient::class);
+        return auth()->check()
+            && auth()->user()->can('create', Patient::class);
     }
 
 

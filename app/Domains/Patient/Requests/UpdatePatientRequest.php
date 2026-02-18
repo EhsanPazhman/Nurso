@@ -10,9 +10,9 @@ class UpdatePatientRequest extends FormRequest
     {
         $patient =  $this->route('patient');
 
-        return auth()->guard->check()
+        return auth()->check()
             && $patient
-            && auth()->guard->user()->can('update', $patient);
+            && auth()->user()->can('update', $patient);
     }
 
 
