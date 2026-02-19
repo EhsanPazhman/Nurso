@@ -15,14 +15,17 @@ class PatientTimeline extends Component
 
     protected function getHumanValue($key, $value)
     {
-        if ($value === null || $value === '') return 'None';
+        if ($value === null || $value === '') return '---';
+
         return match ($key) {
-            'doctor_id' => User::find($value)?->name ?? 'Unknown Physician',
+            'doctor_id' => User::find($value)?->name ?? 'Deleted Staff',
             'department_id' => Department::find($value)?->name ?? 'Unknown Dept',
-            'status', 'gender' => ucfirst($value),
+            'status' => str($value)->headline(),
+            'gender' => str($value)->headline(),
             default => $value,
         };
     }
+
 
     public function render()
     {
@@ -32,17 +35,29 @@ class PatientTimeline extends Component
             ->latest()
             ->get()
             ->map(function ($activity) {
-                $activity->time_formatted = $activity->created_at->format('h:i A');
-                $activity->date_formatted = $activity->created_at->format('Y/m/d');
+                $localTime = $activity->created_at->timezone('Asia/Kabul');
+
+                $activity->time_formatted = $localTime->format('h:i A');
+                $activity->date_formatted = $localTime->format('Y/m/d');
 
                 if ($activity->description === 'updated' && isset($activity->changes['attributes'])) {
                     $changes = [];
+                    $ignoredFields = ['updated_at', 'deleted_at', 'id', 'created_at'];
+
                     foreach ($activity->changes['attributes'] as $key => $value) {
-                        if (in_array($key, ['updated_at', 'deleted_at'])) continue;
+                        if (in_array($key, $ignoredFields)) continue;
+
+                        $oldValue = $activity->changes['old'][$key] ?? null;
+
+                        $cleanOld = ($oldValue === null || $oldValue === '') ? null : $oldValue;
+                        $cleanNew = ($value === null || $value === '') ? null : $value;
+
+                        if ($cleanOld === $cleanNew) continue;
+
                         $changes[] = [
                             'label' => str_replace('_', ' ', $key),
-                            'old'   => $this->getHumanValue($key, $activity->changes['old'][$key] ?? null),
-                            'new'   => $this->getHumanValue($key, $value),
+                            'old'   => $this->getHumanValue($key, $cleanOld),
+                            'new'   => $this->getHumanValue($key, $cleanNew),
                         ];
                     }
                     $activity->custom_changes = $changes;
@@ -51,6 +66,9 @@ class PatientTimeline extends Component
             })
             ->reject(function ($activity) {
                 if ($activity->description === 'updated' && empty($activity->custom_changes)) {
+                    return true;
+                }
+                if (!$activity->causer_id && $activity->description === 'updated') {
                     return true;
                 }
                 return false;

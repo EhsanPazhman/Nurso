@@ -65,7 +65,19 @@ class Patient extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['first_name', 'last_name', 'status', 'department_id', 'doctor_id'])
+            ->logOnly([
+                'first_name',
+                'last_name',
+                'father_name',
+                'phone',
+                'gender',
+                'status',
+                'doctor_id',
+                'department_id',
+                'date_of_birth',
+                'address',
+                'national_id',
+            ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('patient_clinical_audit');

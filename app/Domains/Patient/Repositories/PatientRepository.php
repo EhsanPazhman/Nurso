@@ -70,16 +70,14 @@ class PatientRepository
     public function restore(int $id): Patient
     {
         $patient = Patient::withTrashed()->findOrFail($id);
-
-        $patient->disableLogging();
+        $patient->status = 'active';
+        $patient->saveQuietly();
 
         $patient->restore();
-        $patient->update(['status' => 'active']);
-
-        $patient->enableLogging();
 
         return $patient;
     }
+
 
     public function existsByNationalId(?string $nationalId): bool
     {

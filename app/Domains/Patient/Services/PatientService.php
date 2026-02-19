@@ -30,12 +30,6 @@ class PatientService
 
             $patient = $this->repository->create($data);
 
-            activity('patient')
-                ->performedOn($patient)
-                ->causedBy(auth::user())
-                ->withProperties(['patient_code' => $patient->patient_code])
-                ->log('Patient created');
-
             return $patient;
         });
     }
@@ -47,7 +41,6 @@ class PatientService
     public function update(Patient $patient, array $data): Patient
     {
         return DB::transaction(function () use ($patient, $data) {
-
             if (
                 isset($data['national_id']) &&
                 $data['national_id'] !== $patient->national_id &&
@@ -55,17 +48,10 @@ class PatientService
             ) {
                 throw new \DomainException('National ID already in use.');
             }
-
-            $updatedPatient = $this->repository->update($patient, $data);
-
-            activity('patient')
-                ->performedOn($updatedPatient)
-                ->causedBy(auth::user())
-                ->log('Patient updated');
-
-            return $updatedPatient;
+            return $this->repository->update($patient, $data);
         });
     }
+
 
     /* =========================
      |  Delete (Soft)
@@ -74,13 +60,9 @@ class PatientService
     public function delete(Patient $patient): void
     {
         DB::transaction(function () use ($patient) {
-            $patient->update(['status' => 'inactive']);
+            $patient->status = 'inactive';
+            $patient->saveQuietly();
             $this->repository->delete($patient);
-
-            activity('patient')
-                ->performedOn($patient)
-                ->causedBy(auth::user())
-                ->log('Patient deleted');
         });
     }
 
@@ -91,11 +73,6 @@ class PatientService
     public function restore(int $id): Patient
     {
         $patient = $this->repository->restore($id);
-
-        activity()
-            ->performedOn($patient)
-            ->causedBy(auth()->user())
-            ->log('restored'); 
 
         return $patient;
     }
@@ -123,11 +100,6 @@ class PatientService
     {
         DB::transaction(function () use ($patient, $status) {
             $this->repository->updateStatus($patient, $status);
-
-            activity('patient')
-                ->performedOn($patient)
-                ->causedBy(auth::user())
-                ->log("Status changed to {$status}");
         });
     }
 }
