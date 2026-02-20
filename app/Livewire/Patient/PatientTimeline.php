@@ -29,6 +29,10 @@ class PatientTimeline extends Component
 
     public function render()
     {
+        $patient = Patient::withTrashed()->findOrFail($this->patientId);
+        if (auth()->user()->role !== 'admin' && auth()->user()->department_id !== $patient->department_id) {
+            abort(403, 'You do not have access to this patient\'s history.');
+        }
         $activities = Activity::where('subject_type', Patient::class)
             ->where('subject_id', $this->patientId)
             ->with('causer')
