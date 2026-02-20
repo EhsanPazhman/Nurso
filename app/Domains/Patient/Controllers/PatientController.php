@@ -2,14 +2,15 @@
 
 namespace App\Domains\Patient\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
-use App\Domains\Patient\Repositories\PatientRepository;
 use App\Domains\Patient\Requests\StorePatientRequest;
+use App\Domains\Patient\Requests\PatientVitalsRequest;
 use App\Domains\Patient\Requests\UpdatePatientRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Domains\Patient\Repositories\PatientRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PatientController extends Controller
@@ -50,6 +51,15 @@ class PatientController extends Controller
         return response()->json([
             'message' => 'Patient created successfully',
             'data' => $patient
+        ], 201);
+    }
+
+    public function storeVitals(PatientVitalsRequest $request, Patient $patient)
+    {
+        $vital = $this->service->recordVitals($patient, $request->validated());
+        return response()->json([
+            'message' => 'Vitals recorded successfully',
+            'data' => $vital
         ], 201);
     }
 

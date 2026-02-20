@@ -66,4 +66,24 @@ class PatientPolicy
     {
         return $user->can('patient.delete') && $user->hasRole('hospital_admin');
     }
+
+    /**
+     * recordVitals determines if a user can add or edit vital signs for a patient. This is more permissive than general updates, as it allows nurses to contribute clinical data without modifying identity information.
+     */
+    public function recordVitals(User $user, Patient $patient)
+    {
+        if (!$user->hasPermission('patient.view')) return false;
+
+        if ($user->hasRole('hospital_admin')) return true;
+
+        if ($user->hasRole('doctor')) {
+            return $user->id === $patient->doctor_id;
+        }
+
+        if ($user->hasRole('nurse')) {
+            return $user->department_id === $patient->department_id;
+        }
+
+        return false;
+    }
 }

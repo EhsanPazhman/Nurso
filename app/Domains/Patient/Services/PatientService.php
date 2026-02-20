@@ -2,11 +2,13 @@
 
 namespace App\Domains\Patient\Services;
 
-use App\Domains\Patient\Repositories\PatientRepository;
-use App\Domains\Patient\Models\Patient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Domains\Patient\Models\Vital;
+use App\Domains\Patient\Models\Patient;
+use App\Domains\Patient\Repositories\PatientRepository;
 
 class PatientService
 {
@@ -31,6 +33,21 @@ class PatientService
             $patient = $this->repository->create($data);
 
             return $patient;
+        });
+    }
+
+    /* =========================
+     |  Add Vitals
+     | =========================
+     */
+    public function recordVitals(Patient $patient, array $data): Vital
+    {
+        return DB::transaction(function () use ($patient, $data) {
+            Gate::authorize('recordVitals', $patient);
+
+            $data['user_id'] = auth()->id();
+
+            return $this->repository->addVitals($patient, $data);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domains\Patient\Repositories;
 
+use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Models\Patient;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -103,5 +104,10 @@ class PatientRepository
     public function updateStatus(Patient $patient, string $status): bool
     {
         return $patient->update(['status' => $status]);
+    }
+    
+    public function addVitals(Patient $patient, array $data): Vital
+    {
+        return $patient->vitals()->create($data);
     }
 }

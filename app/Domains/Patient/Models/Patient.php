@@ -126,4 +126,14 @@ class Patient extends Model
     {
         return $this->belongsTo(User::class, 'doctor_id');
     }
+
+    public function vitals()
+    {
+        return $this->hasMany(Vital::class);
+    }
+
+    public function latestVitals()
+    {
+        return $this->hasOne(Vital::class)->latestOfMany();
+    }
 }

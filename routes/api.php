@@ -23,13 +23,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/register', [AuthController::class, 'register']); 
+        Route::post('/register', [AuthController::class, 'register']);
     });
 
     // Patient Domain
     Route::apiResource('/patients', PatientController::class)->except(['index']);
     Route::post('/patients/{id}/restore', [PatientController::class, 'restore'])->name('patients.restore');
-
+    Route::post('/patients/{patient}/vitals', [PatientController::class, 'storeVitals'])
+        ->name('patients.vitals.store');
     // Future: Add Staff Controller here for external API consumers
     // Route::apiResource('staff', StaffController::class);
 });
