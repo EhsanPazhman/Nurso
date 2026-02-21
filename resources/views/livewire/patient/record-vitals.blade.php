@@ -38,6 +38,9 @@
                                         class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                                     <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">mmHg</span>
                                 </div>
+                                @error('diastolic')
+                                    <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="space-y-1">
@@ -47,6 +50,9 @@
                                     class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm">
                                 <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">BPM</span>
                             </div>
+                            @error('pulse_rate')
+                                <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="space-y-6 lg:border-x lg:px-8 border-slate-100">
@@ -59,6 +65,9 @@
                                         class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm">
                                     <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">%</span>
                                 </div>
+                                @error('spo2')
+                                    <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="space-y-1">
                                 <label class="text-xs font-medium text-slate-500">Respiration</label>
@@ -67,6 +76,9 @@
                                         class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm">
                                     <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">/min</span>
                                 </div>
+                                @error('respiratory_rate')
+                                    <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
@@ -77,6 +89,9 @@
                                         class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm">
                                     <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">°C</span>
                                 </div>
+                                @error('temperature')
+                                    <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="space-y-1">
                                 <label class="text-xs font-medium text-slate-500">Weight</label>
@@ -85,6 +100,9 @@
                                         class="w-full pl-3 pr-10 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm">
                                     <span class="absolute right-3 top-2.5 text-[10px] text-slate-400">Kg</span>
                                 </div>
+                                @error('weight')
+                                    <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -99,6 +117,9 @@
                             <label class="text-xs font-medium text-slate-500">Nursing Notes</label>
                             <textarea wire:model="nursing_note" rows="3" placeholder="Any clinical observations..."
                                 class="w-full px-3 py-2.5 bg-slate-50 border-slate-200 rounded-xl text-sm resize-none"></textarea>
+                            @error('nursing_note')
+                                <span class="text-rose-500 text-[10px]">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -108,7 +129,8 @@
                     <button type="submit"
                         class="px-10 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center gap-2 cursor-pointer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7" />
                         </svg>
                         Submit Vitals
                     </button>

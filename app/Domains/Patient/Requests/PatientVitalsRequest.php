@@ -22,14 +22,14 @@ class PatientVitalsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'systolic'         => 'nullable|integer|between:40,250',
-            'diastolic'        => 'nullable|integer|between:20,160',
+            'systolic'         => 'required|integer|between:40,250',
+            'diastolic'        => 'required|integer|between:20,160',
             'temperature'      => 'nullable|numeric|between:30,45',
-            'pulse_rate'       => 'nullable|integer|between:20,250',
-            'spo2'             => 'nullable|integer|between:40,100',
+            'pulse_rate'       => 'required|integer|between:20,250',
+            'spo2'             => 'required|integer|between:40,100',
             'respiratory_rate' => 'nullable|integer|between:5,60',
             'weight'           => 'nullable|numeric|between:0.5,600',
-            'nursing_note'     => 'nullable|string|max:1000',
+            'nursing_note'     => 'required|string|max:1000',
             'recorded_at'      => 'required|date|before_or_equal:now',
         ];
     }

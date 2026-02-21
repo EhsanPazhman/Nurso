@@ -77,7 +77,6 @@ class PatientForm extends Component
             }
 
             $this->dispatch('notify', type: 'success', message: $msg);
-            return $this->redirectRoute('patients', navigate: true);
         } catch (\DomainException $e) {
             $this->addError('national_id', $e->getMessage());
         } catch (\Exception $e) {

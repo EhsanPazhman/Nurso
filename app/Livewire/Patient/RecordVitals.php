@@ -31,10 +31,8 @@ class RecordVitals extends Component
 
         $service->recordVitals($this->patient, $data);
 
-        $this->dispatch('vitals-recorded');
+        $this->dispatch('notify', type: 'success', message: 'Clinical vitals recorded.');
         $this->reset(['systolic', 'diastolic', 'temperature', 'pulse_rate', 'spo2', 'respiratory_rate', 'weight', 'nursing_note']);
-
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Clinical vitals recorded.']);
     }
 
     public function render()

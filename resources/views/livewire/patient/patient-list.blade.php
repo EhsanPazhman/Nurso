@@ -226,14 +226,17 @@
                                         </button>
                                     @else
                                         <a href="{{ route('patient.vitals', $patient->id) }}"
-                                            class="inline-flex items-center p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all duration-200 group"
-                                            title="Clinical Vitals">
-                                            <svg class="w-5 h-5 group-hover:scale-110" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                            class="inline-flex items-center p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all duration-200 group"
+                                            title="Record Vital Signs">
+                                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h1l1-2l2 4l1-2h1" />
                                             </svg>
                                         </a>
+
                                         @can('update', $patient)
                                             <a href="{{ route('patient.edit', $patient->id) }}" wire:navigate
                                                 class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
