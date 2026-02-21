@@ -8,7 +8,7 @@
         </div>
         @can('create', App\Domains\Patient\Models\Patient::class)
             <a href="{{ route('patient.create') }}" wire:navigate
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                class="px-10 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center gap-2 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
@@ -225,6 +225,15 @@
                                             </svg>
                                         </button>
                                     @else
+                                        <a href="{{ route('patient.vitals', $patient->id) }}"
+                                            class="inline-flex items-center p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all duration-200 group"
+                                            title="Clinical Vitals">
+                                            <svg class="w-5 h-5 group-hover:scale-110" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </a>
                                         @can('update', $patient)
                                             <a href="{{ route('patient.edit', $patient->id) }}" wire:navigate
                                                 class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
@@ -238,7 +247,7 @@
                                         @can('delete', $patient)
                                             <button wire:click="deletePatient({{ $patient->id }})"
                                                 wire:confirm="Are you sure you want to move this patient to trash?"
-                                                class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                                                class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer">
                                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -14,9 +14,9 @@ class RecordVitals extends Component
     public $systolic, $diastolic, $temperature, $pulse_rate, $spo2, $respiratory_rate, $weight, $nursing_note;
     public $recorded_at;
 
-    public function mount(Patient $patient)
+    public function mount($patientId)
     {
-        $this->patient = $patient;
+        $this->patient = Patient::withTrashed()->findOrFail($patientId);
         $this->recorded_at = now()->format('Y-m-d\TH:i');
     }
 
@@ -39,6 +39,6 @@ class RecordVitals extends Component
 
     public function render()
     {
-        return view('livewire.patient.record-vitals');
+        return view('livewire.patient.record-vitals')->layout('layouts.app');
     }
 }

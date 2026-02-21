@@ -30,4 +30,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/patient/create', PatientForm::class)->middleware('can:patient.create')->name('patient.create');
     Route::get('/patient/{patientId}/edit', PatientForm::class)->middleware('can:patient.update')
         ->name('patient.edit');
+    Route::get('/patient/{patientId}/vitals', \App\Livewire\Patient\RecordVitals::class)->middleware('can:patient.view')->name('patient.vitals');
 });
