@@ -30,7 +30,7 @@ class PatientVitalsRequest extends FormRequest
             'respiratory_rate' => 'nullable|integer|between:5,60',
             'weight'           => 'nullable|numeric|between:0.5,600',
             'nursing_note'     => 'required|string|max:1000',
-            'recorded_at'      => 'required|date|before_or_equal:now',
+            'recorded_at'      => 'required|date_format:Y-m-d\TH:i',
         ];
     }
     public function messages(): array

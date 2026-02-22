@@ -17,7 +17,7 @@ class RecordVitals extends Component
     public function mount($patientId)
     {
         $this->patient = Patient::withTrashed()->findOrFail($patientId);
-        $this->recorded_at = now()->format('Y-m-d\TH:i');
+        $this->recorded_at = now('Asia/Kabul')->format('Y-m-d\TH:i');
     }
 
     protected function rules()
@@ -37,6 +37,14 @@ class RecordVitals extends Component
 
     public function render()
     {
-        return view('livewire.patient.record-vitals')->layout('layouts.app');
+        $vitalsHistory = $this->patient->vitals()
+            ->with('user')
+            ->latest('recorded_at')
+            ->take(10)
+            ->get();
+
+        return view('livewire.patient.record-vitals', [
+            'vitalsHistory' => $vitalsHistory
+        ])->layout('layouts.app');
     }
 }
