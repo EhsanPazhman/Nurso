@@ -215,7 +215,7 @@ class Vital extends Model
             'life_threatening' => 'bg-rose-700 rounded-md text-white font-bold animate-pulse',
             'critical'         => 'text-rose-600 font-bold',
             'warning'          => 'text-amber-500 font-bold',
-            'borderline'       => 'text-yellow-500 font-semibold',
+            'borderline'       => 'text-yellow-500 font-semibold', 
             default            => 'text-emerald-600 font-bold',
         };
     }

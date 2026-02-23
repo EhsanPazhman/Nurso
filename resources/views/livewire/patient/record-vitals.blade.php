@@ -208,11 +208,11 @@
                                     <td class="px-4 py-3 {{ $history->blood_pressure_color }}">
                                         {{ $history->systolic }}/{{ $history->diastolic }}
                                     </td>
-                                    <td class="px-4 py-3 {{ $history->temperature_color }}">
-                                        {{ $history->temperature }}°C
-                                    </td>
                                     <td class="px-4 py-3 {{ $history->pulse_rate_color }}">
                                         {{ $history->pulse_rate }}
+                                    </td>
+                                    <td class="px-4 py-3 {{ $history->temperature_color }}">
+                                        {{ $history->temperature }}°C
                                     </td>
                                     <td class="px-4 py-3 {{ $history->spo2_color }}">
                                         {{ $history->spo2 }}%

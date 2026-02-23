@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Livewire\Patient\PatientForm;
 use App\Livewire\Patient\PatientList;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Patient\GeneralVitalsMonitor;
 use App\Domains\Patient\Controllers\PatientController;
 
 Route::get('/login', Login::class)->name('login');
@@ -31,4 +32,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/patient/{patientId}/edit', PatientForm::class)->middleware('can:patient.update')
         ->name('patient.edit');
     Route::get('/patient/{patientId}/vitals', \App\Livewire\Patient\RecordVitals::class)->middleware('can:patient.view')->name('patient.vitals');
+    Route::get('/clinical/monitor', GeneralVitalsMonitor::class)->middleware('can:patient.view')->name('clinical.monitor');
 });
