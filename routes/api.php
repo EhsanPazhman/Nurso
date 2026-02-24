@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Domains\Patient\Controllers\PatientController;
 use App\Domains\Auth\Controllers\AuthController;
+use App\Domains\Patient\Controllers\PatientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,27 +10,40 @@ use App\Domains\Auth\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 /*
 |--------------------------------------------------------------------------
-| Protected Routes (Sanctum)
+| Protected Routes
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Auth & Staff Management
-    Route::prefix('/auth')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Auth
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/register', [AuthController::class, 'register']);
+        // Register staff through AuthController (admin only)
+        Route::post('/register', [AuthController::class, 'register'])->middleware('can:create,App\Domains\Auth\Models\User');
     });
 
-    // Patient Domain
-    Route::apiResource('/patients', PatientController::class)->except(['index']);
-    Route::post('/patients/{id}/restore', [PatientController::class, 'restore'])->name('patients.restore');
-    Route::post('/patients/{patient}/vitals', [PatientController::class, 'storeVitals'])
-        ->name('patients.vitals.store');
-    // Future: Add Staff Controller here for external API consumers
-    // Route::apiResource('staff', StaffController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | Patients
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource('patients', PatientController::class);
+
+    Route::post('patients/{patient}/restore', [PatientController::class, 'restore']);
+
+    Route::post('patients/{patient}/vitals', [PatientController::class, 'storeVitals']);
 });

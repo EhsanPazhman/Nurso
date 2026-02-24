@@ -8,8 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Livewire\Patient\PatientForm;
 use App\Livewire\Patient\PatientList;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Patient\RecordVitals;
 use App\Livewire\Patient\GeneralVitalsMonitor;
-use App\Domains\Patient\Controllers\PatientController;
+
+/*
+|--------------------------------------------------------------------------
+| Guest Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/', Login::class)->name('login');
@@ -21,16 +27,57 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
-    Route::get('/staffs', StaffList::class)->name('staffs');
-    Route::get('/staff/register', Register::class)->middleware('can:staff.register')->name('staff.register');
-    Route::get('/staff/{staffId}/edit', Register::class)->middleware('can:staff.update')->name('staff.edit');
 
-    Route::get('/patients', PatientList::class)->middleware('can:patient.view')->name('patients');
-    Route::get('/patient/create', PatientForm::class)->middleware('can:patient.create')->name('patient.create');
-    Route::get('/patient/{patientId}/edit', PatientForm::class)->middleware('can:patient.update')
-        ->name('patient.edit');
-    Route::get('/patient/{patientId}/vitals', \App\Livewire\Patient\RecordVitals::class)->middleware('can:patient.view')->name('patient.vitals');
-    Route::get('/clinical/monitor', GeneralVitalsMonitor::class)->middleware('can:patient.view')->name('clinical.monitor');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
+
+    // =========================
+    // Staff Domain
+    // =========================
+    Route::prefix('staff')->name('staff.')->group(function () {
+
+        Route::get('/', StaffList::class)
+            ->middleware('can:viewAny,App\Domains\Auth\Models\User')
+            ->name('index');
+
+        Route::get('/create', Register::class)
+            ->middleware('can:create,App\Domains\Auth\Models\User')
+            ->name('create');
+
+        Route::get('/{staff}/edit', Register::class)
+            ->middleware('can:update,staff')
+            ->name('edit');
+    });
+
+    // =========================
+    // Patient Domain
+    // =========================
+    Route::prefix('patients')->name('patients.')->group(function () {
+
+        Route::get('/', PatientList::class)
+            ->middleware('can:viewAny,App\Domains\Patient\Models\Patient')
+            ->name('index');
+
+        Route::get('/create', PatientForm::class)
+            ->middleware('can:create,App\Domains\Patient\Models\Patient')
+            ->name('create');
+
+        Route::get('/{patient}/edit', PatientForm::class)
+            ->middleware('can:update,patient')
+            ->name('edit');
+
+        Route::get('/{patient}/vitals', RecordVitals::class)
+            ->middleware('can:recordVitals,patient')
+            ->name('vitals');
+    });
+
+    Route::get('/clinical/monitor', GeneralVitalsMonitor::class)
+        ->middleware('can:viewAny,App\Domains\Patient\Models\Patient')
+        ->name('clinical.monitor');
 });

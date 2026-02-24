@@ -2,14 +2,16 @@
 
 namespace App\Providers;
 
-use App\Domains\Patient\Models\Patient; 
-use App\Domains\Patient\Policies\PatientPolicy; 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
+use App\Policies\UserPolicy;
+use App\Domains\Auth\Models\User;
+use App\Domains\Patient\Models\Patient;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Domains\Patient\Policies\PatientPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
+        User::class => UserPolicy::class,
         Patient::class => PatientPolicy::class,
     ];
 
@@ -20,8 +22,6 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        foreach ($this->policies as $model => $policy) {
-            Gate::policy($model, $policy);
-        }
+        //
     }
 }

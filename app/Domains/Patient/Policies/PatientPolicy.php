@@ -7,19 +7,38 @@ use App\Domains\Patient\Models\Patient;
 
 class PatientPolicy
 {
-    public function viewAny(User $user)
+    /**
+     * Global bypass for super administrators.
+     */
+    public function before(User $user): ?bool
+    {
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine whether the user can view the patient list.
+     */
+    public function viewAny(User $user): bool
     {
         return $user->hasPermission('patient.view');
     }
 
     /**
-     * Determine if user can view a SPECIFIC patient profile.
+     * Determine whether the user can view a specific patient.
      */
-    public function view(User $user, Patient $patient)
+    public function view(User $user, Patient $patient): bool
     {
-        if (!$user->hasPermission('patient.view')) return false;
+        if (!$user->hasPermission('patient.view')) {
+            return false;
+        }
 
-        if ($user->hasRole(['hospital_admin', 'reception'])) return true;
+        if ($user->hasRole(['hospital_admin', 'reception'])) {
+            return true;
+        }
 
         if ($user->hasRole('doctor')) {
             return $user->id === $patient->doctor_id;
@@ -33,48 +52,55 @@ class PatientPolicy
     }
 
     /**
-     * Only specialized roles can register new patients
+     * Determine whether the user can create a patient.
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        return $user->can('patient.create') && $user->hasRole(['reception', 'hospital_admin']);
+        return $user->hasPermission('patient.create')
+            && $user->hasRole(['hospital_admin', 'reception']);
     }
 
     /**
-     * Determine who can edit identity/base information of a patient
+     * Determine whether the user can update a specific patient.
      */
-    public function update(User $user, Patient $patient)
+    public function update(User $user, Patient $patient): bool
     {
-        if (!$user->can('patient.update')) return false;
+        if (!$user->hasPermission('patient.update')) {
+            return false;
+        }
 
-        // Nurses are strictly forbidden from editing identity records
-        if ($user->hasRole('nurse')) return false;
-
-        // Doctors can update clinical context of THEIR patients
         if ($user->hasRole('doctor')) {
             return $user->id === $patient->doctor_id;
         }
 
-        // Hospital Admins and Receptionists handle identity/contact updates
-        return $user->hasRole(['hospital_admin', 'reception']);
+        if ($user->hasRole('nurse')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * Deletion is a high-level administrative task
+     * Determine whether the user can delete a patient.
      */
-    public function delete(User $user, Patient $patient)
+    public function delete(User $user, Patient $patient): bool
     {
-        return $user->can('patient.delete') && $user->hasRole('hospital_admin');
+        return $user->hasPermission('patient.delete')
+            && $user->hasRole('hospital_admin');
     }
 
     /**
-     * recordVitals determines if a user can add or edit vital signs for a patient. This is more permissive than general updates, as it allows nurses to contribute clinical data without modifying identity information.
+     * Determine whether the user can record vitals for a patient.
      */
-    public function recordVitals(User $user, Patient $patient)
+    public function recordVitals(User $user, Patient $patient): bool
     {
-        if (!$user->hasPermission('patient.view')) return false;
+        if (!$user->hasPermission('patient.recordVitals')) {
+            return false;
+        }
 
-        if ($user->hasRole('hospital_admin')) return true;
+        if ($user->hasRole('hospital_admin')) {
+            return true;
+        }
 
         if ($user->hasRole('doctor')) {
             return $user->id === $patient->doctor_id;
