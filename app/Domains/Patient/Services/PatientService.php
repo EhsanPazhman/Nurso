@@ -52,6 +52,25 @@ class PatientService
     }
 
     /* =========================
+     |  Get Department Vitals (For Clinical Monitor)
+     | =========================
+     */
+    public function getDepartmentVitals(int $perPage = 20)
+    {
+        $user = auth()->user();
+
+        $query = Vital::with(['patient', 'user'])->latest('recorded_at');
+
+        if (!$user->hasRole(['super_admin', 'hospital_admin'])) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('department_id', $user->department_id);
+            });
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    /* =========================
      |  Update Patient
      | =========================
      */

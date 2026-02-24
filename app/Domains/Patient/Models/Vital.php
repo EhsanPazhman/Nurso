@@ -212,11 +212,11 @@ class Vital extends Model
     protected function mapStatusToColor($status)
     {
         return match ($status) {
-            'life_threatening' => 'bg-rose-700 rounded-md text-white font-bold animate-pulse',
-            'critical'         => 'text-rose-600 font-bold',
-            'warning'          => 'text-amber-500 font-bold',
-            'borderline'       => 'text-yellow-500 font-semibold', 
-            default            => 'text-emerald-600 font-bold',
+            'life_threatening' => 'text-rose-700 bg-rose-50 px-2 py-1 rounded ring-1 ring-rose-200 animate-[pulse_1s_cubic-bezier(0.4,0,0.6,1)_infinite] font-black',
+            'critical'         => 'text-rose-600 bg-rose-50/50 px-2 py-0.5 rounded font-bold',
+            'warning'          => 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-bold',
+            'borderline'       => 'text-yellow-600 font-semibold',
+            default            => 'text-emerald-600 font-medium',
         };
     }
 }

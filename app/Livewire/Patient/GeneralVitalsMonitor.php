@@ -3,28 +3,15 @@
 namespace App\Livewire\Patient;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use App\Domains\Patient\Models\Vital;
+use App\Domains\Patient\Services\PatientService;
 
 class GeneralVitalsMonitor extends Component
 {
-    use WithPagination;
 
-    public function render()
+    public function render(PatientService $patientService)
     {
-        $user = auth()->user();
-
-        $query = Vital::with(['patient', 'user'])
-            ->latest('recorded_at');
-
-        // if ($user->role !== 'hospital_admin') {
-        //     $query->whereHas('patient', function ($q) use ($user) {
-        //         $q->where('department_id', $user->department_id);
-        //     });
-        // }
-
-        return view('livewire.patient.general-vitals-monitor', [
-            'vitals' => $query->paginate(20)
+        return view('livewire.Patient.general-vitals-monitor', [
+            'vitals' => $patientService->getDepartmentVitals()
         ])->layout('layouts.app');
     }
 }

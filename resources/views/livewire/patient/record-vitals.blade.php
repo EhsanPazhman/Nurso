@@ -196,7 +196,7 @@
                                 <th class="px-4 py-3">Temp</th>
                                 <th class="px-4 py-3">SpO2</th>
                                 <th class="px-4 py-3">Res</th>
-                                <th class="px-4 py-3">Staff</th>
+                                <th class="px-4 py-3">Recorded By</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">

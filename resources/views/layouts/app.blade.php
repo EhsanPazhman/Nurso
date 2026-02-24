@@ -65,19 +65,28 @@
                 </a>
             @endcan
 
-            <!-- Clinical Monitoring Link -->
-            <a href="{{ route('clinical.monitor') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('clinical.monitor') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100' }}">
-                <svg class="w-5 h-5 {{ request()->routeIs('clinical.monitor') ? 'text-white' : 'text-indigo-500' }}"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <!-- آیکون پالس/مانیتورینگ -->
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span class="font-semibold text-sm">Clinical Monitor</span>
+            @can('viewAny', App\Domains\Patient\Models\Patient::class)
+                <a href="{{ route('clinical.monitor') }}" wire:navigate
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 group {{ request()->routeIs('clinical.monitor') ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
 
-                <span class="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            </a>
+                    <!-- ECG Heartbeat Icon -->
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('clinical.monitor') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h2l2 9l4-18l2 9h2" />
+                    </svg>
+
+                    <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Clinical
+                        Monitor</span>
+
+                    <!-- Live Status Indicator -->
+                    <span x-show="isSidebarExpanded" class="ml-auto flex h-2 w-2 relative">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                </a>
+            @endcan
+
 
             <a href="#"
                 class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 transition group">
