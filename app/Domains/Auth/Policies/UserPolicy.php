@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Policies;
+namespace App\Domains\Auth\Policies;
 
 use App\Domains\Auth\Models\User;
 
@@ -9,7 +9,7 @@ class UserPolicy
     /**
      * Global bypass for super administrators.
      */
-    public function before(User $user): ?bool
+    public function before(User $user, string $ability): ?bool
     {
         if ($user->hasRole('super_admin')) {
             return true;

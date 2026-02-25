@@ -7,8 +7,6 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Models\Role;
 use App\Domains\Auth\Services\AuthService;
 use App\Domains\Department\Models\Department;
-use App\Domains\Auth\Requests\RegisterRequest;
-use App\Domains\Auth\Requests\UpdateStaffRequest;
 
 class Register extends Component
 {
@@ -21,23 +19,30 @@ class Register extends Component
     public string $role = '';
     public ?string $department_id = null; // String for better select-box matching
 
-    public function mount(?int $staffId = null)
+    public function mount(User $staff)
     {
-        if ($staffId) {
-            $this->staff = User::findOrFail($staffId);
 
-            $this->authorize('update', $this->staff);
+        if ($staff->exists) {
+            $this->staff = $staff;
 
-            $this->name = $this->staff->name;
-            $this->email = $this->staff->email;
-            $this->phone = $this->staff->phone ?? '';
-            $this->department_id = (string) $this->staff->department_id;
-            $this->role = $this->staff->roles->first()?->name ?? '';
+            abort_unless(auth()->user()->can('update', $this->staff), 403);
+
+            $this->fillStaffData();
         } else {
-            $this->authorize('create', User::class);
+            abort_unless(auth()->user()->can('create', User::class), 403);
+
+            $this->initializeNewStaff();
         }
     }
 
+    protected function fillStaffData()
+    {
+        $this->name = $this->staff->name;
+        $this->email = $this->staff->email;
+        $this->phone = $this->staff->phone;
+        $this->role = $this->staff->roles->first()?->name ?? '';
+        $this->department_id = $this->staff->department_id;
+    }
     protected function rules(): array
     {
         if ($this->staff) {
@@ -64,7 +69,7 @@ class Register extends Component
             }
 
             $this->dispatch('notify', type: 'success', message: $message);
-            return $this->redirectRoute('staffs', navigate: true);
+            return $this->redirectRoute('staff', navigate: true);
         } catch (\Exception $e) {
             $this->addError('email', 'Operation failed: ' . $e->getMessage());
         }

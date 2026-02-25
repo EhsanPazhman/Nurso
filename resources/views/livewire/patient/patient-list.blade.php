@@ -7,7 +7,7 @@
                     class="font-bold text-slate-700">{{ $patients->total() }}</span></p>
         </div>
         @can('create', App\Domains\Patient\Models\Patient::class)
-            <a href="{{ route('patient.create') }}" wire:navigate
+            <a href="{{ route('patients.create') }}" wire:navigate
                 class="px-10 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center gap-2 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -225,7 +225,7 @@
                                             </svg>
                                         </button>
                                     @else
-                                        <a href="{{ route('patient.vitals', $patient->id) }}"
+                                        <a href="{{ route('patients.vitals', $patient->id) }}"
                                             class="inline-flex items-center p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all duration-200 group"
                                             title="Record Vital Signs">
                                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform"
@@ -238,7 +238,7 @@
                                         </a>
 
                                         @can('update', $patient)
-                                            <a href="{{ route('patient.edit', $patient->id) }}" wire:navigate
+                                            <a href="{{ route('patients.edit', ['patient' => $patient->id]) }}" wire:navigate
                                                 class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -272,7 +272,6 @@
             </table>
         </div>
     </div>
-
     <!-- 3. Pagination Area -->
     <div class="mt-6">
         {{ $patients->links() }}

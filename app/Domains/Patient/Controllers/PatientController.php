@@ -16,6 +16,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class PatientController extends Controller
 {
     use AuthorizesRequests;
+
+    /**
+     * Constructor to inject service and repository dependencies.
+     */
     public function __construct(
         protected PatientService $service,
         protected PatientRepository $repository
@@ -23,6 +27,8 @@ class PatientController extends Controller
 
     /* =========================
      |  List Patients
+     |  GET /patients
+     |  Policy: viewAny(Patient::class)
      | =========================
      */
     public function index(Request $request): JsonResponse
@@ -40,6 +46,8 @@ class PatientController extends Controller
 
     /* =========================
      |  Store Patient
+     |  POST /patients
+     |  Policy: create(Patient::class)
      | =========================
      */
     public function store(StorePatientRequest $request): JsonResponse
@@ -54,9 +62,18 @@ class PatientController extends Controller
         ], 201);
     }
 
-    public function storeVitals(PatientVitalsRequest $request, Patient $patient)
+    /* =========================
+     |  Record Patient Vitals
+     |  POST /patients/{patient}/vitals
+     |  Policy: recordVitals($patient)
+     | =========================
+     */
+    public function storeVitals(PatientVitalsRequest $request, Patient $patient): JsonResponse
     {
+        $this->authorize('recordVitals', $patient);
+
         $vital = $this->service->recordVitals($patient, $request->validated());
+
         return response()->json([
             'message' => 'Vitals recorded successfully',
             'data' => $vital
@@ -64,7 +81,9 @@ class PatientController extends Controller
     }
 
     /* =========================
-     |  Show Patient
+     |  Show Single Patient
+     |  GET /patients/{patient}
+     |  Policy: view($patient)
      | =========================
      */
     public function show(Patient $patient): JsonResponse
@@ -76,12 +95,12 @@ class PatientController extends Controller
 
     /* =========================
      |  Update Patient
+     |  PUT/PATCH /patients/{patient}
+     |  Policy: update($patient)
      | =========================
      */
-    public function update(
-        UpdatePatientRequest $request,
-        Patient $patient
-    ): JsonResponse {
+    public function update(UpdatePatientRequest $request, Patient $patient): JsonResponse
+    {
         $this->authorize('update', $patient);
 
         $updated = $this->service->update($patient, $request->validated());
@@ -93,7 +112,9 @@ class PatientController extends Controller
     }
 
     /* =========================
-     |  Delete Patient (Soft)
+     |  Soft Delete Patient
+     |  DELETE /patients/{patient}
+     |  Policy: delete($patient)
      | =========================
      */
     public function destroy(Patient $patient): JsonResponse
@@ -108,7 +129,9 @@ class PatientController extends Controller
     }
 
     /* =========================
-     |  Restore Patient
+     |  Restore Soft-Deleted Patient
+     |  POST /patients/{id}/restore
+     |  Policy: restore($patient)
      | =========================
      */
     public function restore(int $id): JsonResponse

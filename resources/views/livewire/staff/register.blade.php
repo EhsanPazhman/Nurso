@@ -81,7 +81,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                <a href="{{ route('staffs') }}" wire:navigate
+                <a href="{{ route('staff.index') }}" wire:navigate
                     class="w-1/3 text-center text-slate-500 font-bold py-3.5 rounded-xl hover:bg-slate-100 transition-all cursor-pointer">
                     Cancel
                 </a>

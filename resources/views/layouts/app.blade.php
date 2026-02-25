@@ -53,9 +53,9 @@
             <p x-show="isSidebarExpanded" x-cloak
                 class="mt-6 px-2 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medical Services
             </p>
-
+            
             @can('viewAny', App\Domains\Patient\Models\Patient::class)
-                <a href="{{ route('patients') }}" wire:navigate
+                <a href="{{ route('patients.index') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('patients.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,11 +66,11 @@
             @endcan
 
             @can('viewAny', App\Domains\Patient\Models\Patient::class)
-                <a href="{{ route('clinical.monitor') }}" wire:navigate
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 group {{ request()->routeIs('clinical.monitor') ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
+                <a href="{{ route('patients.clinical.monitor') }}" wire:navigate
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 group {{ request()->routeIs('patients.clinical.monitor') ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
 
                     <!-- ECG Heartbeat Icon -->
-                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('clinical.monitor') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}"
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('patients.clinical.monitor') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h2l2 9l4-18l2 9h2" />
                     </svg>
@@ -99,7 +99,7 @@
             </a>
 
             @can('viewAny', \App\Domains\Auth\Models\User::class)
-                <a href="{{ route('staffs') }}" wire:navigate
+                <a href="{{ route('staff.index') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors group">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

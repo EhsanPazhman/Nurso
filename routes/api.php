@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource('patients', PatientController::class);
+    Route::apiResource('patient', PatientController::class);
 
     Route::post('patients/{patient}/restore', [PatientController::class, 'restore']);
 

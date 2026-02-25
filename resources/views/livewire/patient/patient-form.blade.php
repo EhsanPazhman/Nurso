@@ -9,7 +9,7 @@
                 <p class="text-sm text-slate-500">Comprehensive patient registry. Fields marked with <span
                         class="text-red-500">*</span> are mandatory.</p>
             </div>
-            <a href="{{ route('patients') }}"
+            <a href="{{ route('patients.index') }}"
                 class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                 ← Back to List
             </a>
@@ -184,11 +184,13 @@
                 </div>
             </form>
         </div>
-        @if ($patient && $patient->exists)
-            <div class="mt-12 max-w-4xl mx-auto pb-20">
-                <livewire:patient.patient-timeline :patientId="$patient->id"
-                    wire:key="patient-timeline-{{ $patient->id }}" />
-            </div>
-        @endif
+        @can('viewTimeline', $patient)
+            @if ($patient && $patient->exists)
+                <div class="mt-12 max-w-4xl mx-auto pb-20">
+                    <livewire:patient.patient-timeline :patientId="$patient->id"
+                        wire:key="patient-timeline-{{ $patient->id }}" />
+                </div>
+            @endif
+        @endcan
     </div>
 </div>

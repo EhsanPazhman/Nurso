@@ -17,7 +17,7 @@
             </button>
 
             @if (!$showTrashed)
-                <a href="{{ route('staff.register') }}" wire:navigate
+                <a href="{{ route('staff.create') }}" wire:navigate
                     class="px-6 py-3 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
                     Add New Staff
                 </a>
@@ -115,7 +115,7 @@
                                     </button>
                                 @else
                                     <!-- Edit Button -->
-                                    <a href="{{ route('staff.edit', $member->id) }}" wire:navigate
+                                    <a href="{{ route('staff.edit', ['staff' => $member->id]) }}" wire:navigate
                                         class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all shadow-sm border border-transparent hover:border-blue-100"
                                         title="Edit Staff">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

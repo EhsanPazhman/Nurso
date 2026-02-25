@@ -10,7 +10,7 @@ class PatientPolicy
     /**
      * Global bypass for super administrators.
      */
-    public function before(User $user): ?bool
+    public function before(User $user, string $ability): ?bool
     {
         if ($user->hasRole('super_admin')) {
             return true;
@@ -111,5 +111,32 @@ class PatientPolicy
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether the user can view the patient's timeline.
+     */
+    public function viewTimeline(User $user, Patient $patient): bool
+    {
+        if ($user->hasRole(['super_admin', 'hospital_admin'])) {
+            return true;
+        }
+
+        if ($user->hasRole('doctor')) {
+            return (int) $user->id === (int) $patient->doctor_id;
+        }
+
+        if ($user->hasRole('nurse')) {
+            return (int) $user->department_id === (int) $patient->department_id;
+        }
+
+        return false;
+    }
+    /**
+     * Determine whether the user can restore a soft-deleted patient.
+     */
+    public function restore(User $user, Patient $patient)
+    {
+        return $user->hasRole(['super_admin', 'hospital_admin']);
     }
 }
