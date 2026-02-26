@@ -17,43 +17,26 @@ class PatientController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * Constructor to inject service and repository dependencies.
-     */
     public function __construct(
         protected PatientService $service,
         protected PatientRepository $repository
     ) {}
 
-    /* =========================
-     |  List Patients
-     |  GET /patients
-     |  Policy: viewAny(Patient::class)
-     | =========================
-     */
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Patient::class);
 
         $patients = $this->repository->paginate(
             perPage: $request->integer('per_page', 15),
-            search: $request->string('search')->toString(),
-            status: $request->string('status')->toString()
+            filters: $request->only(['search', 'status'])
         );
 
         return response()->json($patients);
     }
 
-    /* =========================
-     |  Store Patient
-     |  POST /patients
-     |  Policy: create(Patient::class)
-     | =========================
-     */
     public function store(StorePatientRequest $request): JsonResponse
     {
-        $this->authorize('create', Patient::class);
-
+        // Authorization is handled inside the FormRequest
         $patient = $this->service->create($request->validated());
 
         return response()->json([
@@ -62,16 +45,9 @@ class PatientController extends Controller
         ], 201);
     }
 
-    /* =========================
-     |  Record Patient Vitals
-     |  POST /patients/{patient}/vitals
-     |  Policy: recordVitals($patient)
-     | =========================
-     */
     public function storeVitals(PatientVitalsRequest $request, Patient $patient): JsonResponse
     {
-        $this->authorize('recordVitals', $patient);
-
+        // Authorization is handled inside the FormRequest
         $vital = $this->service->recordVitals($patient, $request->validated());
 
         return response()->json([
@@ -80,69 +56,41 @@ class PatientController extends Controller
         ], 201);
     }
 
-    /* =========================
-     |  Show Single Patient
-     |  GET /patients/{patient}
-     |  Policy: view($patient)
-     | =========================
-     */
     public function show(Patient $patient): JsonResponse
     {
         $this->authorize('view', $patient);
-
-        return response()->json($patient);
+        return response()->json($patient->load(['department', 'doctor', 'latestVitals']));
     }
 
-    /* =========================
-     |  Update Patient
-     |  PUT/PATCH /patients/{patient}
-     |  Policy: update($patient)
-     | =========================
-     */
     public function update(UpdatePatientRequest $request, Patient $patient): JsonResponse
     {
-        $this->authorize('update', $patient);
-
-        $updated = $this->service->update($patient, $request->validated());
+        // Authorization is handled inside the FormRequest
+        $this->service->update($patient, $request->validated());
 
         return response()->json([
             'message' => 'Patient updated successfully',
-            'data' => $updated
+            'data' => $patient->fresh()
         ]);
     }
 
-    /* =========================
-     |  Soft Delete Patient
-     |  DELETE /patients/{patient}
-     |  Policy: delete($patient)
-     | =========================
-     */
     public function destroy(Patient $patient): JsonResponse
     {
         $this->authorize('delete', $patient);
-
         $this->service->delete($patient);
 
-        return response()->json([
-            'message' => 'Patient deleted successfully'
-        ]);
+        return response()->json(['message' => 'Patient deleted successfully']);
     }
 
-    /* =========================
-     |  Restore Soft-Deleted Patient
-     |  POST /patients/{id}/restore
-     |  Policy: restore($patient)
-     | =========================
-     */
     public function restore(int $id): JsonResponse
     {
-        $patient = $this->service->restore($id);
-
+        $patient = Patient::withTrashed()->findOrFail($id);
         $this->authorize('restore', $patient);
+
+        $this->service->restore($id);
 
         return response()->json([
             'message' => 'Patient restored successfully',
-            'data' => $patient
+            'data' => $patient->fresh()
         ]);
     }
 }

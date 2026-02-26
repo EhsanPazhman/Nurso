@@ -7,25 +7,31 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePatientRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
-        return auth()->check()
-            && auth()->user()->can('create', Patient::class);
+        return auth()->check() && auth()->user()->can('create', Patient::class);
     }
 
-
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'father_name' => 'nullable|string|max:100',
-            'gender'     => 'required|in:male,female',
-            'date_of_birth' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'first_name'      => 'required|string|max:100',
+            'last_name'       => 'required|string|max:100',
+            'father_name'     => 'nullable|string|max:100',
+            'gender'          => 'required|in:male,female',
+            'date_of_birth'   => 'nullable|date|before:today',
+            'phone'           => 'nullable|string|max:20',
             'secondary_phone' => 'nullable|string|max:20',
-            'national_id' => 'nullable|string|max:50|unique:patients,national_id',
-            'address' => 'nullable|string',
+            'national_id'     => 'nullable|string|max:50|unique:patients,national_id',
+            'address'         => 'nullable|string|max:500',
+            'department_id'   => 'required|exists:departments,id',
+            'doctor_id'       => 'nullable|exists:users,id',
         ];
     }
 }

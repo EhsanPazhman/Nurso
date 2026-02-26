@@ -2,19 +2,21 @@
 
 namespace App\Domains\Patient\Models;
 
-use id;
 use App\Domains\Auth\Models\User;
-use Spatie\Activitylog\LogOptions;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Activitylog\Traits\LogsActivity;
 use App\Domains\Department\Models\Department;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Patient extends Model
 {
-    use SoftDeletes;
-    use LogsActivity;
+    use SoftDeletes, LogsActivity;
+
     protected $table = 'patients';
 
     protected $fillable = [
@@ -38,16 +40,15 @@ class Patient extends Model
     protected $casts = [
         'date_of_birth' => 'date',
         'department_id' => 'integer',
-        'doctor_id' => 'integer',
-        'deleted_at'    => 'datetime',
+        'doctor_id'     => 'integer',
+        'created_by'    => 'integer',
+        'updated_by'    => 'integer',
     ];
 
-    /* =========================
-     |  Model Boot
-     | =========================
+    /**
+     * Auto-assign user IDs during creation and update
      */
-
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($patient) {
             $patient->created_by = auth()->id();
@@ -58,9 +59,8 @@ class Patient extends Model
         });
     }
 
-    /* =========================
-     |  Activity Log Options
-     | =========================
+    /**
+     * Activity log configuration
      */
     public function getActivitylogOptions(): LogOptions
     {
@@ -68,15 +68,11 @@ class Patient extends Model
             ->logOnly([
                 'first_name',
                 'last_name',
-                'father_name',
-                'phone',
-                'gender',
                 'status',
                 'doctor_id',
                 'department_id',
-                'date_of_birth',
-                'address',
-                'national_id',
+                'phone',
+                'national_id'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -85,54 +81,56 @@ class Patient extends Model
 
     /* =========================
      |  Scopes
-     | =========================
-     */
+     | ========================= */
 
-    public function scopeActive(Builder $query): Builder
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('status', 'active');
+        $query->where('status', 'active');
     }
 
-    public function scopeSearch(Builder $query, ?string $term): Builder
+    public function scopeSearch(Builder $query, ?string $term): void
     {
-        if (!$term) {
-            return $query;
+        if ($term) {
+            $query->where(function ($inner) use ($term) {
+                $inner->where('first_name', 'like', "%{$term}%")
+                    ->orWhere('last_name', 'like', "%{$term}%")
+                    ->orWhere('patient_code', 'like', "%{$term}%")
+                    ->orWhere('phone', 'like', "%{$term}%")
+                    ->orWhere('national_id', 'like', "%{$term}%");
+            });
         }
-
-        return $query->where(function ($q) use ($term) {
-            $q->where('first_name', 'like', "%{$term}%")
-                ->orWhere('last_name', 'like', "%{$term}%")
-                ->orWhere('patient_code', 'like', "%{$term}%")
-                ->orWhere('phone', 'like', "%{$term}%");
-        });
     }
 
     /* =========================
-     |  Accessors
-     | =========================
-     */
+     |  Accessors & Relations
+     | ========================= */
 
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
     }
 
-    public function department()
+    public function getAgeAttribute(): ?int
+    {
+        return $this->date_of_birth ? $this->date_of_birth->age : null;
+    }
+
+    public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function doctor()
+    public function doctor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'doctor_id');
     }
 
-    public function vitals()
+    public function vitals(): HasMany
     {
         return $this->hasMany(Vital::class);
     }
 
-    public function latestVitals()
+    public function latestVitals(): HasOne
     {
         return $this->hasOne(Vital::class)->latestOfMany();
     }

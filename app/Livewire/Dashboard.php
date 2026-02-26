@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Domains\Patient\Repositories\PatientRepository;
+use App\Domains\Auth\Models\User;
 
 class Dashboard extends Component
 {
@@ -17,15 +18,22 @@ class Dashboard extends Component
         $user = auth()->user();
 
         return view('livewire.dashboard', [
-            'totalPatients' => $repository->getTotalCount(),
-            'todayAdmissions' => $repository->getTodayAdmissionsCount(),
+            // Using the restored methods in Repository
+            'totalPatients'    => $repository->getTotalCount(),
+            'todayAdmissions'  => $repository->getTodayAdmissionsCount(),
 
-            'activeDoctorsCount' => \App\Domains\Auth\Models\User::where('is_active', 1)
-                ->whereHas('roles', fn($q) => $q->where('name', 'doctor'))->count(),
+            // Count active doctors
+            'activeDoctorsCount' => User::where('is_active', true)
+                ->whereHas('roles', function ($q) {
+                    $q->where('name', 'doctor');
+                })->count(),
 
-            'recentPatients' => $user->can('patient.view') ? $repository->getRecent(6) : collect(),
+            // Fetch recent patients based on user permissions
+            'recentPatients' => $user->can('viewAny', \App\Domains\Patient\Models\Patient::class)
+                ? $repository->getRecent(6)
+                : collect(),
 
-            'occupancyRate' => 75,
+            'occupancyRate' => 75, // Placeholder for future logic
         ])->layout('layouts.app');
     }
 }

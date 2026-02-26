@@ -2,112 +2,107 @@
 
 namespace App\Domains\Patient\Repositories;
 
-use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Models\Patient;
+use App\Domains\Patient\Models\Vital;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PatientRepository
 {
-    protected $model;
+    public function __construct(protected Patient $model) {}
 
-    public function __construct(Patient $model)
+    /**
+     * Paginate patients with filters and role-based access control
+     */
+    public function paginate(int $perPage = 10, array $filters = []): LengthAwarePaginator
     {
-        $this->model = $model;
-    }
-
-    public function paginate(int $perPage = 10, string $search = '', string $status = '', bool $onlyTrashed = false, $fromDate = null, $toDate = null)
-    {
-        $query = $this->model::query();
         $user = auth()->user();
 
-        if ($user->hasRole('doctor')) {
-            $query->where('doctor_id', $user->id);
-        } elseif ($user->hasRole('nurse')) {
-            $query->where('department_id', $user->department_id);
-        }
-
-        if ($fromDate && $toDate) {
-            $query->whereBetween('created_at', [$fromDate, $toDate]);
-        }
-
-        if ($onlyTrashed) $query->onlyTrashed();
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('father_name', 'like', "%{$search}%")
-                    ->orWhere('patient_code', 'like', "%{$search}%");
-            });
-        }
-
-        if ($status && !$onlyTrashed) $query->where('status', $status);
-
-        return $query->with(['department', 'doctor'])->latest()->paginate($perPage);
-    }
-
-    public function findById(int $id): Patient
-    {
-        return Patient::findOrFail($id);
+        return $this->model::query()
+            ->when($user->hasRole('doctor'), function ($q) use ($user) {
+                return $q->where('doctor_id', $user->id);
+            })
+            ->when($user->hasRole('nurse'), function ($q) use ($user) {
+                return $q->where('department_id', $user->department_id);
+            })
+            ->when($filters['search'] ?? null, function ($q, $term) {
+                return $q->search($term);
+            })
+            ->when($filters['status'] ?? null, function ($q, $status) {
+                return $q->where('status', $status);
+            })
+            ->when($filters['only_trashed'] ?? false, function ($q) {
+                return $q->onlyTrashed();
+            })
+            ->with(['department', 'doctor'])
+            ->latest()
+            ->paginate($perPage);
     }
 
     public function create(array $data): Patient
     {
-        return Patient::create($data);
+        return $this->model::create($data);
     }
 
-    public function update(Patient $patient, array $data): Patient
+    public function update(Patient $patient, array $data): bool
     {
-        $patient->update($data);
-
-        return $patient;
-    }
-
-    public function delete(Patient $patient): void
-    {
-        $patient->delete();
+        return $patient->update($data);
     }
 
     public function restore(int $id): Patient
     {
-        $patient = Patient::withTrashed()->findOrFail($id);
-        $patient->status = 'active';
-        $patient->saveQuietly();
-
+        $patient = $this->model::withTrashed()->findOrFail($id);
         $patient->restore();
-
+        $patient->update(['status' => 'active']);
         return $patient;
     }
 
-
-    public function existsByNationalId(?string $nationalId): bool
+    public function existsByNationalId(string $nationalId, ?int $exceptId = null): bool
     {
-        if (!$nationalId) {
-            return false;
-        }
-
-        return Patient::where('national_id', $nationalId)->exists();
-    }
-    public function getRecent(int $limit = 5)
-    {
-        return Patient::latest()->limit($limit)->get();
-    }
-    public function getTotalCount(): int
-    {
-        return Patient::count();
+        return $this->model::where('national_id', $nationalId)
+            ->when($exceptId, function ($q) use ($exceptId) {
+                return $q->where('id', '!=', $exceptId);
+            })
+            ->exists();
     }
 
-    public function getTodayAdmissionsCount(): int
-    {
-        return Patient::whereDate('created_at', now()->today())->count();
-    }
-    public function updateStatus(Patient $patient, string $status): bool
-    {
-        return $patient->update(['status' => $status]);
-    }
-    
     public function addVitals(Patient $patient, array $data): Vital
     {
         return $patient->vitals()->create($data);
+    }
+
+    /**
+     * Get the total count of active patients.
+     */
+    public function getTotalCount(): int
+    {
+        return $this->model::where('status', 'active')->count();
+    }
+
+    /**
+     * Get the count of patients admitted today.
+     */
+    public function getTodayAdmissionsCount(): int
+    {
+        return $this->model::whereDate('created_at', now()->today())->count();
+    }
+
+    /**
+     * Get recent patients for the dashboard with role-based filtering.
+     */
+    public function getRecent(int $limit = 6)
+    {
+        $user = auth()->user();
+
+        return $this->model::query()
+            ->when($user->hasRole('doctor'), function ($q) use ($user) {
+                return $q->where('doctor_id', $user->id);
+            })
+            ->when($user->hasRole('nurse'), function ($q) use ($user) {
+                return $q->where('department_id', $user->department_id);
+            })
+            ->with(['department', 'doctor'])
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 }

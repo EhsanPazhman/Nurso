@@ -6,19 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PatientVitalsRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        $patient = $this->route('patient');
+        return $this->user()->can('recordVitals', $patient);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -30,9 +23,10 @@ class PatientVitalsRequest extends FormRequest
             'respiratory_rate' => 'nullable|integer|between:5,60',
             'weight'           => 'nullable|numeric|between:0.5,600',
             'nursing_note'     => 'required|string|max:1000',
-            'recorded_at'      => 'required|date_format:Y-m-d\TH:i',
+            'recorded_at'      => 'required|date|before_or_equal:now',
         ];
     }
+
     public function messages(): array
     {
         return [

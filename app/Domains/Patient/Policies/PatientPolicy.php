@@ -12,11 +12,7 @@ class PatientPolicy
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-
-        return null;
+        return $user->hasRole('super_admin') ? true : null;
     }
 
     /**
@@ -41,11 +37,11 @@ class PatientPolicy
         }
 
         if ($user->hasRole('doctor')) {
-            return $user->id === $patient->doctor_id;
+            return (int) $user->id === (int) $patient->doctor_id;
         }
 
         if ($user->hasRole('nurse')) {
-            return $user->department_id === $patient->department_id;
+            return (int) $user->department_id === (int) $patient->department_id;
         }
 
         return false;
@@ -69,15 +65,15 @@ class PatientPolicy
             return false;
         }
 
+        if ($user->hasRole('hospital_admin')) {
+            return true;
+        }
+
         if ($user->hasRole('doctor')) {
-            return $user->id === $patient->doctor_id;
+            return (int) $user->id === (int) $patient->doctor_id;
         }
 
-        if ($user->hasRole('nurse')) {
-            return false;
-        }
-
-        return true;
+        return false; // Nurses cannot update patient records by default
     }
 
     /**
@@ -103,11 +99,11 @@ class PatientPolicy
         }
 
         if ($user->hasRole('doctor')) {
-            return $user->id === $patient->doctor_id;
+            return (int) $user->id === (int) $patient->doctor_id;
         }
 
         if ($user->hasRole('nurse')) {
-            return $user->department_id === $patient->department_id;
+            return (int) $user->department_id === (int) $patient->department_id;
         }
 
         return false;
@@ -118,25 +114,14 @@ class PatientPolicy
      */
     public function viewTimeline(User $user, Patient $patient): bool
     {
-        if ($user->hasRole(['super_admin', 'hospital_admin'])) {
-            return true;
-        }
-
-        if ($user->hasRole('doctor')) {
-            return (int) $user->id === (int) $patient->doctor_id;
-        }
-
-        if ($user->hasRole('nurse')) {
-            return (int) $user->department_id === (int) $patient->department_id;
-        }
-
-        return false;
+        return $this->view($user, $patient);
     }
+
     /**
      * Determine whether the user can restore a soft-deleted patient.
      */
-    public function restore(User $user, Patient $patient)
+    public function restore(User $user, Patient $patient): bool
     {
-        return $user->hasRole(['super_admin', 'hospital_admin']);
+        return $user->hasRole(['hospital_admin']);
     }
 }

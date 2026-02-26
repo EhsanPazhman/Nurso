@@ -20,30 +20,16 @@ Route::prefix('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->prefix('v1')->name('api.v1.')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Auth
-    |--------------------------------------------------------------------------
-    */
+    // Using 'patients' but namespaced with 'api.v1.' to avoid web conflicts
+    Route::apiResource('patients', PatientController::class);
 
-    Route::prefix('auth')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-        // Register staff through AuthController (admin only)
-        Route::post('/register', [AuthController::class, 'register'])->middleware('can:create,App\Domains\Auth\Models\User');
+    Route::prefix('patients/{patient}')->group(function () {
+        Route::post('/restore', [PatientController::class, 'restore'])
+            ->name('patients.restore'); // Full name: api.v1.patients.restore
+
+        Route::post('/vitals', [PatientController::class, 'storeVitals'])
+            ->name('patients.vitals.store');
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Patients
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource('patient', PatientController::class);
-
-    Route::post('patients/{patient}/restore', [PatientController::class, 'restore']);
-
-    Route::post('patients/{patient}/vitals', [PatientController::class, 'storeVitals']);
 });

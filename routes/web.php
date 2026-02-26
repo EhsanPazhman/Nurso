@@ -17,15 +17,18 @@ use App\Livewire\Patient\GeneralVitalsMonitor;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', Login::class)->name('login');
-Route::get('/', Login::class)->name('login');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', Login::class)->name('login');
+    Route::get('/', Login::class);
+});
 
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
+
     Route::post('/logout', function () {
         Auth::logout();
         session()->invalidate();
@@ -36,30 +39,44 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // =========================
-    // Staff Domain
+    // Staff Management
     // =========================
     Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', StaffList::class)
+            ->middleware('can:viewAny,App\Domains\Auth\Models\User')
+            ->name('index');
 
-        Route::get('/', StaffList::class)->middleware('can:viewAny,App\Domains\Auth\Models\User')->name('index');
+        Route::get('/create', Register::class)
+            ->middleware('can:create,App\Domains\Auth\Models\User')
+            ->name('create');
 
-        Route::get('/create', Register::class)->middleware('can:create,App\Domains\Auth\Models\User')->name('create');
-
-        Route::get('/{staff}/edit', Register::class)->middleware('can:update,staff')->name('edit');
+        Route::get('/{staff}/edit', Register::class)
+            ->middleware('can:update,staff')
+            ->name('edit');
     });
 
     // =========================
-    // Patient Domain
+    // Patient Management
     // =========================
     Route::prefix('patients')->name('patients.')->group(function () {
+        Route::get('/', PatientList::class)
+            ->middleware('can:viewAny,App\Domains\Patient\Models\Patient')
+            ->name('index');
 
-        Route::get('/', PatientList::class)->middleware('can:viewAny,App\Domains\Patient\Models\Patient')->name('index');
+        Route::get('/register', PatientForm::class)
+            ->middleware('can:create,App\Domains\Patient\Models\Patient')
+            ->name('create');
 
-        Route::get('/register', PatientForm::class)->middleware('can:create,App\Domains\Patient\Models\Patient')->name('create');
+        Route::get('/clinical-monitor', GeneralVitalsMonitor::class)
+            ->middleware('can:viewAny,App\Domains\Patient\Models\Patient')
+            ->name('clinical.monitor');
 
-        Route::get('/clinical/monitor', GeneralVitalsMonitor::class)->middleware('can:viewAny,App\Domains\Patient\Models\Patient')->name('clinical.monitor');
+        Route::get('/{patient}/edit', PatientForm::class)
+            ->middleware('can:update,patient')
+            ->name('edit');
 
-        Route::get('/{patient}/edit', PatientForm::class)->middleware('can:update,patient')->name('edit');
-
-        Route::get('/{patient}/vitals', RecordVitals::class)->middleware('can:recordVitals,patient')->name('vitals');
+        Route::get('/{patient}/vitals', RecordVitals::class)
+            ->middleware('can:recordVitals,patient')
+            ->name('vitals');
     });
 });

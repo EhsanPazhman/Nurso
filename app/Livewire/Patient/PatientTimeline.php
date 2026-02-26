@@ -7,25 +7,22 @@ use Spatie\Activitylog\Models\Activity;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Department\Models\Department;
 use App\Domains\Auth\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 class PatientTimeline extends Component
 {
     public $patientId;
 
-    protected function getHumanValue($key, $value)
+    protected function getHumanValue(string $key, $value): string
     {
-        if ($value === null || $value === '') return '---';
+        if ($value === null || $value === '') return 'N/A';
 
         return match ($key) {
-            'doctor_id' => User::find($value)?->name ?? 'Deleted Staff',
-            'department_id' => Department::find($value)?->name ?? 'Unknown Dept',
-            'status' => str($value)->headline(),
-            'gender' => str($value)->headline(),
-            default => $value,
+            'doctor_id' => User::find($value)?->name ?? 'Deleted User',
+            'department_id' => Department::find($value)?->name ?? 'Deleted Dept',
+            'status', 'gender' => str($value)->headline(),
+            default => (string) $value,
         };
     }
-
 
     public function render()
     {
@@ -35,44 +32,30 @@ class PatientTimeline extends Component
             ->latest()
             ->get()
             ->map(function ($activity) {
+                // Ensure correct timezone for hospital staff
                 $localTime = $activity->created_at->timezone('Asia/Kabul');
-
                 $activity->time_formatted = $localTime->format('h:i A');
                 $activity->date_formatted = $localTime->format('Y/m/d');
 
                 if ($activity->description === 'updated' && isset($activity->changes['attributes'])) {
                     $changes = [];
-                    $ignoredFields = ['updated_at', 'deleted_at', 'id', 'created_at'];
-
                     foreach ($activity->changes['attributes'] as $key => $value) {
-                        if (in_array($key, $ignoredFields)) continue;
+                        if (in_array($key, ['updated_at', 'id'])) continue;
 
                         $oldValue = $activity->changes['old'][$key] ?? null;
-
-                        $cleanOld = ($oldValue === null || $oldValue === '') ? null : $oldValue;
-                        $cleanNew = ($value === null || $value === '') ? null : $value;
-
-                        if ($cleanOld === $cleanNew) continue;
+                        if ($oldValue == $value) continue;
 
                         $changes[] = [
                             'label' => str_replace('_', ' ', $key),
-                            'old'   => $this->getHumanValue($key, $cleanOld),
-                            'new'   => $this->getHumanValue($key, $cleanNew),
+                            'old'   => $this->getHumanValue($key, $oldValue),
+                            'new'   => $this->getHumanValue($key, $value),
                         ];
                     }
                     $activity->custom_changes = $changes;
                 }
                 return $activity;
             })
-            ->reject(function ($activity) {
-                if ($activity->description === 'updated' && empty($activity->custom_changes)) {
-                    return true;
-                }
-                if (!$activity->causer_id && $activity->description === 'updated') {
-                    return true;
-                }
-                return false;
-            });
+            ->reject(fn($a) => $a->description === 'updated' && empty($a->custom_changes));
 
         return view('livewire.patient.patient-timeline', ['activities' => $activities]);
     }
