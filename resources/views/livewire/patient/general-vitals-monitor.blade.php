@@ -22,11 +22,22 @@
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
                 @forelse($vitals as $record)
+                    {{-- Now $record is a Vital model instance --}}
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-4 py-4 whitespace-nowrap">
-                            <div class="font-bold text-slate-900">{{ $record->patient->full_name ?? 'Unknown Patient' }}</div>
-                            <div class="text-xs text-slate-500">ID: {{ $record->patient->patient_code ?? 'Unknown Patient Code' }}</div>
+                            <div class="font-bold text-slate-900">{{ $record->patient->full_name }}</div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="text-[10px] font-mono text-slate-400 italic">#{{ $record->patient->patient_code }}</span>
+                                @if (auth()->user()->hasRole(['super_admin', 'hospital_admin']))
+                                    <span
+                                        class="text-[9px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-bold uppercase">
+                                        {{ $record->patient->department->name ?? 'N/A' }}
+                                    </span>
+                                @endif
+                            </div>
                         </td>
+
                         <td class="px-4 py-4 {{ $record->blood_pressure_color }}">
                             {{ $record->systolic }}/{{ $record->diastolic }}
                         </td>
@@ -43,25 +54,39 @@
                             {{ $record->spo2 }}%
                         </td>
 
-                        <td class="px-4 py-4 {{ $record->respiratory_rate_color }}">
+                        <td class="px-4 py-4 {{ $record->respiration_rate_color }}">
                             {{ $record->respiratory_rate }}
                         </td>
 
                         <td class="px-4 py-4 text-sm text-slate-600">
-                            <div class="font-medium">
+                            <div class="font-medium text-slate-900">
                                 {{ $record->recorded_at->timezone('Asia/Kabul')->format('h:i A') }}
                             </div>
-                            <div class="text-[10px] text-slate-400">{{ $record->recorded_at->format('Y-m-d') }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">
+                                {{ $record->recorded_at->format('Y-m-d') }}</div>
                         </td>
 
-                        <td class="px-4 py-4 text-xs text-indigo-600 font-semibold">
-                            {{ $record->user->name }}
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-600 font-bold">
+                                    {{ substr($record->user->name, 0, 1) }}
+                                </div>
+                                <span class="text-xs text-indigo-600 font-semibold">{{ $record->user->name }}</span>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-10 text-slate-400 italic">
-                            No clinical data available for this department.
+                        <td colspan="8" class="text-center py-20 text-slate-400 italic bg-slate-50/50">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-8 h-8 mb-2 text-slate-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                No clinical events recorded in this scope yet.
+                            </div>
                         </td>
                     </tr>
                 @endforelse

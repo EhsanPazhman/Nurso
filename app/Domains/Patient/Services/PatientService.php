@@ -93,18 +93,21 @@ class PatientService
     /**
      * Get the latest vitals for all patients in the user's department
      */
-    public function getDepartmentVitals(int $perPage = 10)
+    public function getDepartmentVitals(int $perPage = 15)
     {
         $user = auth()->user();
 
-        return Patient::query()
-            ->where('status', 'active')
-            ->has('vitals') // Only patients who have at least one vital record
-            ->when(!$user->hasRole(['super_admin', 'hospital_admin']), function ($q) use ($user) {
-                return $q->where('department_id', $user->department_id);
+        return Vital::query()
+            ->with(['patient.department', 'user'])
+            ->whereHas('patient', function ($q) use ($user) {
+                $q->where('status', 'active');
+
+                // Scope by department if NOT an admin
+                if (!$user->hasRole(['super_admin', 'hospital_admin'])) {
+                    $q->where('department_id', $user->department_id);
+                }
             })
-            ->with(['latestVitals', 'doctor', 'department'])
-            ->latest()
+            ->latest('recorded_at') // Crucial for a "Monitor Feed"
             ->paginate($perPage);
     }
 }
