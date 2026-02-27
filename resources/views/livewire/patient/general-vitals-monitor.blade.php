@@ -24,8 +24,8 @@
                 @forelse($vitals as $record)
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-4 py-4 whitespace-nowrap">
-                            <div class="font-bold text-slate-900">{{ $record->patient->full_name }}</div>
-                            <div class="text-xs text-slate-500">ID: {{ $record->patient->patient_code }}</div>
+                            <div class="font-bold text-slate-900">{{ $record->patient->full_name ?? 'Unknown Patient' }}</div>
+                            <div class="text-xs text-slate-500">ID: {{ $record->patient->patient_code ?? 'Unknown Patient Code' }}</div>
                         </td>
                         <td class="px-4 py-4 {{ $record->blood_pressure_color }}">
                             {{ $record->systolic }}/{{ $record->diastolic }}

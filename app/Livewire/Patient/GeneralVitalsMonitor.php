@@ -3,15 +3,17 @@
 namespace App\Livewire\Patient;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Domains\Patient\Services\PatientService;
 
 class GeneralVitalsMonitor extends Component
 {
-    public function render(PatientService $service)
+    use WithPagination;
+
+    public function render(PatientService $patientService)
     {
         return view('livewire.patient.general-vitals-monitor', [
-            // Ensure this method exists in PatientService
-            'vitals' => $service->getDepartmentVitals()
+            'vitals' => $patientService->getDepartmentVitals(12) 
         ])->layout('layouts.app');
     }
 }

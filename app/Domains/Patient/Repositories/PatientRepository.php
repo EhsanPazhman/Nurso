@@ -13,29 +13,53 @@ class PatientRepository
     /**
      * Paginate patients with filters and role-based access control
      */
-    public function paginate(int $perPage = 10, array $filters = []): LengthAwarePaginator
+    /**
+     * Paginate patients with advanced filters and status priority
+     */
+    public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $user = auth()->user();
-
         return $this->model::query()
-            ->when($user->hasRole('doctor'), function ($q) use ($user) {
-                return $q->where('doctor_id', $user->id);
+            // Priority 1: Active patients first, then Inactive, then Deceased
+            ->orderByRaw("CASE 
+                WHEN status = 'active' THEN 1 
+                WHEN status = 'inactive' THEN 2 
+                WHEN status = 'deceased' THEN 3 
+                ELSE 4 END")
+            ->orderBy('updated_at', 'desc')
+            ->when($filters['search'] ?? null, function ($q, $search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('patient_code', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
             })
-            ->when($user->hasRole('nurse'), function ($q) use ($user) {
-                return $q->where('department_id', $user->department_id);
-            })
-            ->when($filters['search'] ?? null, function ($q, $term) {
-                return $q->search($term);
-            })
-            ->when($filters['status'] ?? null, function ($q, $status) {
-                return $q->where('status', $status);
-            })
-            ->when($filters['only_trashed'] ?? false, function ($q) {
-                return $q->onlyTrashed();
-            })
+            ->when($filters['status'] ?? null, fn($q, $status) => $q->where('status', $status))
+            ->when($filters['only_trashed'] ?? false, fn($q) => $q->onlyTrashed())
             ->with(['department', 'doctor'])
-            ->latest()
             ->paginate($perPage);
+    }
+
+    /**
+     * Statistics for dashboard
+     */
+    public function getTotalCount(): int
+    {
+        return $this->model::where('status', 'active')->count();
+    }
+
+    public function getTodayAdmissionsCount(): int
+    {
+        return $this->model::whereDate('created_at', now()->today())->count();
+    }
+
+    public function getRecent(int $limit = 6)
+    {
+        return $this->model::with(['department', 'doctor'])
+            ->where('status', 'active')
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 
     public function create(array $data): Patient
@@ -68,41 +92,5 @@ class PatientRepository
     public function addVitals(Patient $patient, array $data): Vital
     {
         return $patient->vitals()->create($data);
-    }
-
-    /**
-     * Get the total count of active patients.
-     */
-    public function getTotalCount(): int
-    {
-        return $this->model::where('status', 'active')->count();
-    }
-
-    /**
-     * Get the count of patients admitted today.
-     */
-    public function getTodayAdmissionsCount(): int
-    {
-        return $this->model::whereDate('created_at', now()->today())->count();
-    }
-
-    /**
-     * Get recent patients for the dashboard with role-based filtering.
-     */
-    public function getRecent(int $limit = 6)
-    {
-        $user = auth()->user();
-
-        return $this->model::query()
-            ->when($user->hasRole('doctor'), function ($q) use ($user) {
-                return $q->where('doctor_id', $user->id);
-            })
-            ->when($user->hasRole('nurse'), function ($q) use ($user) {
-                return $q->where('department_id', $user->department_id);
-            })
-            ->with(['department', 'doctor'])
-            ->latest()
-            ->limit($limit)
-            ->get();
     }
 }

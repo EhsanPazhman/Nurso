@@ -46,7 +46,21 @@ class PatientList extends Component
         $service->restore($id);
         $this->dispatch('notify', type: 'success', message: 'Patient restored successfully');
     }
+    public function changeStatus(int $id, string $status, PatientService $service)
+    {
+        $patient = Patient::findOrFail($id);
 
+        // Check if user has permission to update patient status
+        $this->authorize('update', $patient);
+
+        $service->update($patient, ['status' => $status]);
+
+        $this->dispatch(
+            'notify',
+            type: 'success',
+            message: "Patient status updated to " . strtoupper($status)
+        );
+    }
     public function render(PatientRepository $repository)
     {
         return view('livewire.patient.patient-list', [

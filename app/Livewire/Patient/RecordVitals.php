@@ -3,48 +3,70 @@
 namespace App\Livewire\Patient;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
 use App\Domains\Patient\Requests\PatientVitalsRequest;
 
 class RecordVitals extends Component
 {
+    use WithPagination;
+
     public Patient $patient;
 
+    // Form properties
     public $systolic, $diastolic, $temperature, $pulse_rate, $spo2, $respiratory_rate, $weight, $nursing_note;
     public $recorded_at;
 
-    public function mount($patientId)
+    /**
+     * Use Route Model Binding by naming the parameter $patient 
+     * exactly as defined in the route {patient}
+     */
+    public function mount(Patient $patient)
     {
-        $this->patient = Patient::withTrashed()->findOrFail($patientId);
+        $this->patient = $patient;
         $this->recorded_at = now('Asia/Kabul')->format('Y-m-d\TH:i');
     }
 
-    protected function rules()
+    protected function rules(): array
     {
         return (new PatientVitalsRequest())->rules();
     }
 
-    public function save(PatientService $service)
+    /**
+     * Persist vital signs to database
+     */
+    public function save(PatientService $service): void
     {
         $data = $this->validate();
 
-        $service->recordVitals($this->patient, $data);
+        try {
+            $service->recordVitals($this->patient, $data);
 
-        $this->dispatch('notify', type: 'success', message: 'Clinical vitals recorded.');
-        $this->reset(['systolic', 'diastolic', 'temperature', 'pulse_rate', 'spo2', 'respiratory_rate', 'weight', 'nursing_note']);
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Clinical vitals recorded successfully.'
+            );
+
+            // Reset only vital fields, keep the patient context
+            $this->reset(['systolic', 'diastolic', 'temperature', 'pulse_rate', 'spo2', 'respiratory_rate', 'weight', 'nursing_note']);
+        } catch (\Exception $e) {
+            $this->dispatch(
+                'notify',
+                type: 'error',
+                message: 'Error occurred while saving vitals.'
+            );
+        }
     }
 
     public function render()
     {
-        $vitalsHistory = $this->patient->vitals()
-            ->with('user')
-            ->latest('recorded_at')
-            ->take(10)
-            ->get();
-
         return view('livewire.patient.record-vitals', [
-            'vitalsHistory' => $vitalsHistory
+            'vitalsHistory' => $this->patient->vitals()
+                ->with('user')
+                ->latest('recorded_at')
+                ->paginate(10)
         ])->layout('layouts.app');
     }
 }
