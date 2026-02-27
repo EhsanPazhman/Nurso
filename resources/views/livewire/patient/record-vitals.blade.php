@@ -19,7 +19,6 @@
                                 </span>
                             </p>
                         </div>
-
                         <a href="{{ route('patients.index') }}"
                             class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                             ← Back
@@ -148,8 +147,10 @@
                                     <input type="datetime-local" wire:model="recorded_at"
                                         value="{{ now()->setTimezone('Asia/Kabul')->format('Y-m-d\TH:i') }}"
                                         class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-medium">
+                                    @error('recorded_at')
+                                        <span class="text-rose-500 text-[11px]">{{ $message }}</span>
+                                    @enderror
                                 </div>
-
                                 <div>
                                     <label class="text-xs font-medium text-slate-500">Nursing Notes</label>
                                     <textarea wire:model="nursing_note" rows="3"

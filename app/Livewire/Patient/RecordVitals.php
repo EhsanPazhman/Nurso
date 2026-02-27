@@ -51,11 +51,13 @@ class RecordVitals extends Component
 
             // Reset only vital fields, keep the patient context
             $this->reset(['systolic', 'diastolic', 'temperature', 'pulse_rate', 'spo2', 'respiratory_rate', 'weight', 'nursing_note']);
+            $this->recorded_at = now('Asia/Kabul')->format('Y-m-d\TH:i');
         } catch (\Exception $e) {
+            logger($e->getMessage());
             $this->dispatch(
                 'notify',
                 type: 'error',
-                message: 'Error occurred while saving vitals.'
+                message: 'Error occurred while saving vitals. ' . $e->getMessage()
             );
         }
     }
