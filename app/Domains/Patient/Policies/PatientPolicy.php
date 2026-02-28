@@ -8,11 +8,22 @@ use App\Domains\Patient\Models\Patient;
 class PatientPolicy
 {
     /**
-     * Global bypass for super administrators.
+     * Global bypass for super administrators and block inactive users.
+     * Super admins always bypass permissions. Inactive users always blocked.
      */
     public function before(User $user, string $ability): ?bool
     {
-        return $user->hasRole('super_admin') ? true : null;
+        // Block inactive users globally
+        if (!$user->is_active) {
+            return false;
+        }
+
+        // Super admin bypass
+        if ($user->hasPermission('super_admin')) {
+            return true;
+        }
+
+        return null;
     }
 
     /**
@@ -25,6 +36,7 @@ class PatientPolicy
 
     /**
      * Determine whether the user can view a specific patient.
+     * Access depends on permission and contextual assignment (doctor or department).
      */
     public function view(User $user, Patient $patient): bool
     {
@@ -32,15 +44,18 @@ class PatientPolicy
             return false;
         }
 
-        if ($user->hasRole(['hospital_admin', 'reception'])) {
+        // Admin/reception can view all
+        if ($user->hasPermission('patient.view.all')) {
             return true;
         }
 
-        if ($user->hasRole('doctor')) {
+        // Doctor can view own patients
+        if ($user->hasPermission('patient.view.own')) {
             return (int) $user->id === (int) $patient->doctor_id;
         }
 
-        if ($user->hasRole('nurse')) {
+        // Nurse can view patients in own department
+        if ($user->hasPermission('patient.view.department')) {
             return (int) $user->department_id === (int) $patient->department_id;
         }
 
@@ -52,8 +67,7 @@ class PatientPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('patient.create')
-            && $user->hasRole(['hospital_admin', 'reception']);
+        return $user->hasPermission('patient.create');
     }
 
     /**
@@ -61,19 +75,15 @@ class PatientPolicy
      */
     public function update(User $user, Patient $patient): bool
     {
-        if (!$user->hasPermission('patient.update')) {
-            return false;
-        }
-
-        if ($user->hasRole('hospital_admin')) {
+        if ($user->hasPermission('patient.update.any')) {
             return true;
         }
 
-        if ($user->hasRole('doctor')) {
+        if ($user->hasPermission('patient.update.own')) {
             return (int) $user->id === (int) $patient->doctor_id;
         }
 
-        return false; // Nurses cannot update patient records by default
+        return false;
     }
 
     /**
@@ -81,8 +91,7 @@ class PatientPolicy
      */
     public function delete(User $user, Patient $patient): bool
     {
-        return $user->hasPermission('patient.delete')
-            && $user->hasRole('hospital_admin');
+        return $user->hasPermission('patient.delete');
     }
 
     /**
@@ -90,19 +99,15 @@ class PatientPolicy
      */
     public function recordVitals(User $user, Patient $patient): bool
     {
-        if (!$user->hasPermission('patient.recordVitals')) {
-            return false;
-        }
-
-        if ($user->hasRole('hospital_admin')) {
+        if ($user->hasPermission('medical.vitals.any')) {
             return true;
         }
 
-        if ($user->hasRole('doctor')) {
+        if ($user->hasPermission('medical.vitals.own')) {
             return (int) $user->id === (int) $patient->doctor_id;
         }
 
-        if ($user->hasRole('nurse')) {
+        if ($user->hasPermission('medical.vitals.department')) {
             return (int) $user->department_id === (int) $patient->department_id;
         }
 
@@ -122,6 +127,6 @@ class PatientPolicy
      */
     public function restore(User $user, Patient $patient): bool
     {
-        return $user->hasRole(['hospital_admin']);
+        return $user->hasPermission('patient.restore');
     }
 }

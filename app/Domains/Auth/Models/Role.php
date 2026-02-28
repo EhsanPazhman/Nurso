@@ -18,6 +18,7 @@ class Role extends Model
 
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class);
+        // Eager loading optimization
+        return $this->belongsToMany(Permission::class)->withTimestamps();
     }
 }

@@ -7,11 +7,15 @@ use App\Domains\Auth\Models\User;
 class UserPolicy
 {
     /**
-     * Global bypass for super administrators.
+     * Global bypass for super administrators and block inactive users.
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super_admin')) {
+        if (!$user->is_active) {
+            return false;
+        }
+
+        if ($user->hasPermission('super_admin')) {
             return true;
         }
 
@@ -31,8 +35,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('staff.create')
-            && $user->hasRole('hospital_admin');
+        return $user->hasPermission('staff.create');
     }
 
     /**
@@ -40,16 +43,15 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        if (!$user->hasPermission('staff.update')) {
-            return false;
-        }
-
-        // Allow self profile update
-        if ($user->id === $model->id) {
+        if ($user->hasPermission('staff.update.any')) {
             return true;
         }
 
-        return $user->hasRole('hospital_admin');
+        if ($user->hasPermission('staff.update.own')) {
+            return $user->id === $model->id;
+        }
+
+        return false;
     }
 
     /**
@@ -57,15 +59,14 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        if (!$user->hasPermission('staff.delete')) {
-            return false;
+        if ($user->hasPermission('staff.delete.any')) {
+            return true;
         }
 
-        // Prevent self deletion
-        if ($user->id === $model->id) {
-            return false;
+        if ($user->hasPermission('staff.delete.own')) {
+            return $user->id !== $model->id;
         }
 
-        return $user->hasRole('hospital_admin');
+        return false;
     }
 }
