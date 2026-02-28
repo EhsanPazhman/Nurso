@@ -10,21 +10,77 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            // Patient Registry
-            ['name' => 'patient.view',   'label' => 'View patient records'],
-            ['name' => 'patient.create', 'label' => 'Register new patients'],
-            ['name' => 'patient.update', 'label' => 'Update patient profiles'],
-            ['name' => 'patient.delete', 'label' => 'Archive/Delete patient records'],
 
-            // Staff & System Management
-            ['name' => 'staff.view',   'label' => 'View staff list'],
-            ['name' => 'staff.create', 'label' => 'Register new staff'],
-            ['name' => 'staff.update', 'label' => 'Edit staff details'],
-            ['name' => 'staff.delete', 'label' => 'Terminate staff access'],
+            /*
+            |--------------------------------------------------------------------------
+            | Patient Domain
+            |--------------------------------------------------------------------------
+            */
 
-            // Clinical & Bed Management (For future use)
-            ['name' => 'medical.vitals', 'label' => 'Record patient vital signs'],
-            ['name' => 'facility.manage', 'label' => 'Manage departments and beds'],
+            ['name' => 'patient.view.any', 'label' => 'View all patients'],
+            ['name' => 'patient.view.own', 'label' => 'View own patients'],
+            ['name' => 'patient.view.department', 'label' => 'View patients in department'],
+            ['name' => 'patient.create', 'label' => 'Register new patient'],
+            ['name' => 'patient.update.any', 'label' => 'Update any patient'],
+            ['name' => 'patient.update.own', 'label' => 'Update own patients'],
+            ['name' => 'patient.delete', 'label' => 'Delete patient'],
+            ['name' => 'patient.restore', 'label' => 'Restore patient'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Medical Domain
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'medical.vitals.any', 'label' => 'Record vitals for any patient'],
+            ['name' => 'medical.vitals.own', 'label' => 'Record vitals for own patients'],
+            ['name' => 'medical.vitals.department', 'label' => 'Record vitals in department'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Staff Domain
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'staff.view', 'label' => 'View staff list'],
+            ['name' => 'staff.create', 'label' => 'Create staff'],
+            ['name' => 'staff.update.any', 'label' => 'Update any staff'],
+            ['name' => 'staff.update.own', 'label' => 'Update own profile'],
+            ['name' => 'staff.delete.any', 'label' => 'Delete any staff'],
+            ['name' => 'staff.delete.own', 'label' => 'Delete own account'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Admission Domain (Future)
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'admission.manage', 'label' => 'Manage admissions'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Department & Facility Domain
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'department.manage', 'label' => 'Manage departments'],
+            ['name' => 'bed.manage', 'label' => 'Manage beds'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Billing Domain (Future)
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'billing.manage', 'label' => 'Manage billing'],
+
+            /*
+            |--------------------------------------------------------------------------
+            | System
+            |--------------------------------------------------------------------------
+            */
+
+            ['name' => 'system.super', 'label' => 'Super administrator access'],
         ];
 
         foreach ($permissions as $permission) {

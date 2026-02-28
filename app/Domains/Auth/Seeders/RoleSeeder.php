@@ -11,6 +11,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
+
             'super_admin' => [
                 'label' => 'System Owner',
                 'permissions' => Permission::pluck('name')->toArray(),
@@ -19,45 +20,55 @@ class RoleSeeder extends Seeder
             'hospital_admin' => [
                 'label' => 'Hospital Administrator',
                 'permissions' => [
-                    'patient.view',
+                    'patient.view.any',
                     'patient.create',
-                    'patient.update',
+                    'patient.update.any',
                     'patient.delete',
+                    'patient.restore',
+
+                    'medical.vitals.any',
+
                     'staff.view',
                     'staff.create',
-                    'staff.update',
-                    'staff.delete',
-                    'facility.manage'
-                ],
-            ],
+                    'staff.update.any',
+                    'staff.delete.any',
 
-            'reception' => [
-                'label' => 'Medical Receptionist',
-                'permissions' => [
-                    'patient.view',
-                    'patient.create',
-                    'patient.update'
+                    'admission.manage',
+                    'department.manage',
+                    'bed.manage',
+                    'billing.manage',
                 ],
             ],
 
             'doctor' => [
                 'label' => 'Attending Physician',
                 'permissions' => [
-                    'patient.view',
-                    'patient.update'
+                    'patient.view.own',
+                    'patient.update.own',
+                    'medical.vitals.own',
                 ],
             ],
 
             'nurse' => [
                 'label' => 'Registered Nurse',
                 'permissions' => [
-                    'patient.view',
-                    'medical.vitals'
+                    'patient.view.department',
+                    'medical.vitals.department',
+                ],
+            ],
+
+            'reception' => [
+                'label' => 'Medical Receptionist',
+                'permissions' => [
+                    'patient.view.any',
+                    'patient.create',
+                    'admission.manage',
                 ],
             ],
         ];
 
         foreach ($roles as $name => $data) {
+
             $role = Role::updateOrCreate(
                 ['name' => $name],
                 ['label' => $data['label']]
