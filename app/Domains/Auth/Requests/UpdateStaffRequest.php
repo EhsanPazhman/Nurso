@@ -9,19 +9,20 @@ class UpdateStaffRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $staff = $this->route('staff');
+        return $staff && $this->user()->can('update', $staff);
     }
 
     public function rules(): array
     {
-        $userId = $this->route('staff') ?? $this->id;
+        $staff = $this->route('staff');
 
         return [
             'name'          => 'required|string|max:255',
             'email'         => [
                 'required',
                 'email',
-                Rule::unique('users')->ignore($userId),
+                Rule::unique('users')->ignore($staff->id),
             ],
             'password'      => 'nullable|string|min:8',
             'role'          => 'required|exists:roles,name',

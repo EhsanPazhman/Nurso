@@ -31,66 +31,83 @@ class PatientController extends Controller
             filters: $request->only(['search', 'status'])
         );
 
-        return response()->json($patients);
+        return response()->json([
+            'status' => 'success',
+            'data'   => $patients
+        ]);
     }
 
     public function store(StorePatientRequest $request): JsonResponse
     {
-        // Authorization is handled inside the FormRequest
         $patient = $this->service->create($request->validated());
 
         return response()->json([
+            'status'  => 'success',
             'message' => 'Patient created successfully',
-            'data' => $patient
+            'data'    => $patient->load(['department', 'doctor']),
         ], 201);
     }
 
     public function storeVitals(PatientVitalsRequest $request, Patient $patient): JsonResponse
     {
-        // Authorization is handled inside the FormRequest
         $vital = $this->service->recordVitals($patient, $request->validated());
 
         return response()->json([
+            'status'  => 'success',
             'message' => 'Vitals recorded successfully',
-            'data' => $vital
+            'data'    => $vital,
         ], 201);
     }
 
     public function show(Patient $patient): JsonResponse
     {
         $this->authorize('view', $patient);
-        return response()->json($patient->load(['department', 'doctor', 'latestVitals']));
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $patient->load([
+                'department',
+                'doctor',
+                'latestVitals'
+            ])
+        ]);
     }
 
     public function update(UpdatePatientRequest $request, Patient $patient): JsonResponse
     {
-        // Authorization is handled inside the FormRequest
         $this->service->update($patient, $request->validated());
 
         return response()->json([
+            'status'  => 'success',
             'message' => 'Patient updated successfully',
-            'data' => $patient->fresh()
+            'data'    => $patient->fresh()->load(['department', 'doctor']),
         ]);
     }
 
     public function destroy(Patient $patient): JsonResponse
     {
         $this->authorize('delete', $patient);
+
         $this->service->delete($patient);
 
-        return response()->json(['message' => 'Patient deleted successfully']);
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Patient deleted successfully',
+        ]);
     }
 
     public function restore(int $id): JsonResponse
     {
         $patient = Patient::withTrashed()->findOrFail($id);
+
         $this->authorize('restore', $patient);
 
-        $this->service->restore($id);
+        $this->service->restore($patient);
 
         return response()->json([
+            'status'  => 'success',
             'message' => 'Patient restored successfully',
-            'data' => $patient->fresh()
+            'data'    => $patient->fresh(),
         ]);
     }
 }

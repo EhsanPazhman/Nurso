@@ -7,17 +7,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePatientRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->can('create', Patient::class);
+        return $this->user()->can('create', Patient::class);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [

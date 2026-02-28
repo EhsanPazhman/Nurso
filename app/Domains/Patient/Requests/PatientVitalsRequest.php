@@ -3,17 +3,20 @@
 namespace App\Domains\Patient\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class PatientVitalsRequest extends FormRequest
 {
     public function authorize(): bool
     {
         $patient = $this->route('patient');
-        return $this->user()->can('recordVitals', $patient);
+        return $patient && $this->user()->can('recordVitals', $patient);
     }
 
     public function rules(): array
     {
+        $maxDate = Carbon::now('Asia/Kabul')->addMinutes(2)->format('Y-m-d H:i:s');
+
         return [
             'systolic'         => 'required|integer|between:40,250',
             'diastolic'        => 'required|integer|between:20,160',
@@ -23,7 +26,7 @@ class PatientVitalsRequest extends FormRequest
             'respiratory_rate' => 'nullable|integer|between:5,60',
             'weight'           => 'nullable|numeric|between:0.5,600',
             'nursing_note'     => 'required|string|max:1000',
-            'recorded_at' => 'required|date|before_or_equal:' . now()->setTimezone('Asia/Kabul')->addMinutes(2)->format('Y-m-d H:i:s'),
+            'recorded_at'      => "required|date|before_or_equal:$maxDate",
         ];
     }
 

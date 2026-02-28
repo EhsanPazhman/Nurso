@@ -2,13 +2,14 @@
 
 namespace App\Domains\Auth\Requests;
 
+use App\Domains\Auth\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', User::class);
     }
 
     public function rules(): array
