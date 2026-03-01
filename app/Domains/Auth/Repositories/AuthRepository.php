@@ -17,29 +17,33 @@ class AuthRepository
         return User::findOrFail($id);
     }
 
-    /**
-     * Get paginated staff with filters for the StaffList
-     */
+    public function findTrashedById(int $id): User
+    {
+        return User::onlyTrashed()->findOrFail($id);
+    }
+
     public function getStaffList(string $search = '', int $perPage = 10): LengthAwarePaginator
     {
         return User::with(['roles', 'department', 'creator'])
             ->where('id', '!=', auth()->id())
-            ->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%"))
             ->latest()
             ->paginate($perPage);
     }
+
     public function getTrashedStaff(string $search = '', int $perPage = 10): LengthAwarePaginator
     {
         return User::onlyTrashed()
             ->with(['roles', 'department'])
-            ->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%"))
             ->latest()
             ->paginate($perPage);
+    }
+
+    public function create(array $data): User
+    {
+        return User::create($data);
     }
 }

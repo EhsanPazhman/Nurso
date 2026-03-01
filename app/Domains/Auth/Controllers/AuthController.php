@@ -10,6 +10,7 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\AuthService;
 use App\Domains\Auth\Requests\RegisterRequest;
 use App\Domains\Auth\Requests\UpdateStaffRequest;
+use App\Domains\Auth\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -36,7 +37,7 @@ class AuthController extends Controller
                 'status' => 'success',
                 'data' => [
                     'token' => $token,
-                    'user'  => $user->load(['roles', 'department']),
+                    'user'  => new UserResource($user->load(['roles', 'department'])),
                 ]
             ]);
         } catch (DomainException $e) {
@@ -54,7 +55,7 @@ class AuthController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Staff registered successfully',
-            'data'    => $user->load(['roles', 'department']),
+            'data'    => new UserResource($user->load(['roles', 'department'])),
         ], 201);
     }
 
@@ -65,7 +66,7 @@ class AuthController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Staff updated successfully',
-            'data'    => $user->load(['roles', 'department']),
+            'data'    => new UserResource($user->load(['roles', 'department'])),
         ]);
     }
 
@@ -73,7 +74,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data'   => $request->user()->load(['roles', 'department']),
+            'data'   => new UserResource($request->user()->load(['roles', 'department'])),
         ]);
     }
 

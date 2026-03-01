@@ -11,6 +11,8 @@ use App\Domains\Patient\Requests\StorePatientRequest;
 use App\Domains\Patient\Requests\PatientVitalsRequest;
 use App\Domains\Patient\Requests\UpdatePatientRequest;
 use App\Domains\Patient\Repositories\PatientRepository;
+use App\Domains\Patient\Resources\PatientResource;
+use App\Domains\Patient\Resources\VitalResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PatientController extends Controller
@@ -33,7 +35,7 @@ class PatientController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => $patients
+            'data'   => PatientResource::collection($patients)
         ]);
     }
 
@@ -44,7 +46,7 @@ class PatientController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Patient created successfully',
-            'data'    => $patient->load(['department', 'doctor']),
+            'data'    => new PatientResource($patient),
         ], 201);
     }
 
@@ -55,7 +57,7 @@ class PatientController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Vitals recorded successfully',
-            'data'    => $vital,
+            'data'    => new VitalResource($vital),
         ], 201);
     }
 
@@ -65,11 +67,7 @@ class PatientController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => $patient->load([
-                'department',
-                'doctor',
-                'latestVitals'
-            ])
+            'data'   => new PatientResource($patient->load(['department', 'doctor', 'latestVitals']))
         ]);
     }
 
@@ -80,7 +78,7 @@ class PatientController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Patient updated successfully',
-            'data'    => $patient->fresh()->load(['department', 'doctor']),
+            'data'    => new PatientResource($patient->fresh()->load(['department', 'doctor'])),
         ]);
     }
 
@@ -107,7 +105,7 @@ class PatientController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Patient restored successfully',
-            'data'    => $patient->fresh(),
+            'data'    => new PatientResource($patient->fresh()),
         ]);
     }
 }

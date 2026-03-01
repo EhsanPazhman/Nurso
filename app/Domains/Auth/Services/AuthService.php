@@ -16,7 +16,7 @@ class AuthService
     public function register(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            $user = User::create([
+            $user = $this->repository->create([
                 'name'          => $data['name'],
                 'email'         => $data['email'],
                 'password'      => Hash::make($data['password']),
@@ -25,28 +25,25 @@ class AuthService
                 'is_active'     => true,
             ]);
 
-            $role = Role::where('name', $data['role'])->first();
-            if ($role) {
-                $user->roles()->attach($role);
+            if (isset($data['role'])) {
+                $role = Role::where('name', $data['role'])->first();
+                if ($role) $user->roles()->attach($role);
             }
 
             return $user;
         });
     }
 
-    /**
-     * Update existing staff member details.
-     */
     public function updateStaff(int $userId, array $data): User
     {
         return DB::transaction(function () use ($userId, $data) {
-            $user = User::findOrFail($userId);
+            $user = $this->repository->findById($userId);
 
             $updateData = [
                 'name'          => $data['name'],
                 'email'         => $data['email'],
                 'phone'         => $data['phone'] ?? $user->phone,
-                'department_id' => !empty($data['department_id']) ? (int) $data['department_id'] : null,
+                'department_id' => $data['department_id'] ?? $user->department_id,
             ];
 
             if (!empty($data['password'])) {
@@ -55,7 +52,7 @@ class AuthService
 
             $user->update($updateData);
 
-            if (isset($data['role'])) {
+            if (!empty($data['role'])) {
                 $role = Role::where('name', $data['role'])->first();
                 if ($role) $user->roles()->sync([$role->id]);
             }
@@ -69,11 +66,11 @@ class AuthService
         $user = $this->repository->findByEmail($email);
 
         if (!$user || !Hash::check($password, $user->password)) {
-            throw new DomainException('Invalid credentials provided.');
+            throw new DomainException('Invalid credentials.');
         }
 
         if (!$user->is_active) {
-            throw new DomainException('User account is currently inactive.');
+            throw new DomainException('User account inactive.');
         }
 
         return $user;
@@ -87,18 +84,17 @@ class AuthService
 
     public function deleteStaff(int $userId): bool
     {
-        $user = $this->repository->findById($userId);
-
         if ($userId === auth()->id()) {
-            throw new DomainException("Self-deletion is prohibited.");
+            throw new DomainException("Cannot delete yourself.");
         }
 
+        $user = $this->repository->findById($userId);
         return $user->delete();
     }
 
     public function restoreStaff(int $userId): bool
     {
-        $user = User::withTrashed()->findOrFail($userId);
+        $user = $this->repository->findTrashedById($userId);
         return $user->restore();
     }
 }

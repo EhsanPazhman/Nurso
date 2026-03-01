@@ -10,39 +10,27 @@ class PatientRepository
 {
     public function __construct(protected Patient $model) {}
 
-    /**
-     * Paginate patients with filters and role-based access control
-     */
-    /**
-     * Paginate patients with advanced filters and status priority
-     */
     public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         return $this->model::query()
-            // Priority 1: Active patients first, then Inactive, then Deceased
             ->orderByRaw("CASE 
                 WHEN status = 'active' THEN 1 
                 WHEN status = 'inactive' THEN 2 
                 WHEN status = 'deceased' THEN 3 
                 ELSE 4 END")
             ->orderBy('updated_at', 'desc')
-            ->when($filters['search'] ?? null, function ($q, $search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('patient_code', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%");
-                });
-            })
+            ->when($filters['search'] ?? null, fn($q, $s) => $q->where(function ($q2) use ($s) {
+                $q2->where('first_name', 'like', "%{$s}%")
+                    ->orWhere('last_name', 'like', "%{$s}%")
+                    ->orWhere('patient_code', 'like', "%{$s}%")
+                    ->orWhere('phone', 'like', "%{$s}%");
+            }))
             ->when($filters['status'] ?? null, fn($q, $status) => $q->where('status', $status))
             ->when($filters['only_trashed'] ?? false, fn($q) => $q->onlyTrashed())
             ->with(['department', 'doctor'])
             ->paginate($perPage);
     }
 
-    /**
-     * Statistics for dashboard
-     */
     public function getTotalCount(): int
     {
         return $this->model::where('status', 'active')->count();
@@ -83,9 +71,7 @@ class PatientRepository
     public function existsByNationalId(string $nationalId, ?int $exceptId = null): bool
     {
         return $this->model::where('national_id', $nationalId)
-            ->when($exceptId, function ($q) use ($exceptId) {
-                return $q->where('id', '!=', $exceptId);
-            })
+            ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
             ->exists();
     }
 

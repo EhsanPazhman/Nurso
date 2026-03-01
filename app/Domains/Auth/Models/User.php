@@ -8,17 +8,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use App\Domains\Auth\Models\Role;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Department\Models\Department;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, SoftDeletes;
+    use HasApiTokens, Notifiable, SoftDeletes, LogsActivity;
 
-    /*
-     * Mass assignable attributes.
-     */
     protected $fillable = [
         'name',
         'email',
@@ -30,76 +29,63 @@ class User extends Authenticatable
         'updated_by'
     ];
 
-    /*
-     * Hidden attributes for serialization.
-     */
     protected $hidden = [
         'password',
     ];
 
-    /*
-     * Attribute casting.
-     */
     protected $casts = [
         'is_active' => 'boolean',
     ];
 
     /**
-     * Automatically track creator and updater.
-     * This ensures audit trail without manual assignment.
+     * Auto-assign creator/updater IDs
      */
     protected static function booted()
     {
         static::creating(function ($user) {
-            if (auth()->check()) {
-                $user->created_by = auth()->id();
-            }
+            if (auth()->check()) $user->created_by = auth()->id();
         });
 
         static::updating(function ($user) {
-            if (auth()->check()) {
-                $user->updated_by = auth()->id();
-            }
+            if (auth()->check()) $user->updated_by = auth()->id();
         });
+    }
+
+    /**
+     * Activity log configuration
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll() // همه فیلدهای قابل تغییر را لاگ می‌کند
+            ->logOnlyDirty() // فقط تغییرات واقعی
+            ->dontSubmitEmptyLogs()
+            ->useLogName('user_audit') // نام جدول/گروه لاگ
+            ->setDescriptionForEvent(fn(string $eventName) => "User record $eventName");
     }
 
     // ---------------- Relations ----------------
 
-    /*
-     * User roles (Many-to-Many).
-     */
     public function roles()
     {
         return $this->belongsToMany(Role::class)->withTimestamps();
     }
 
-    /*
-     * User department (Single department assignment).
-     */
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
 
-    /*
-     * Patients assigned to doctor.
-     */
     public function patients()
     {
         return $this->hasMany(Patient::class, 'doctor_id');
     }
 
-    /*
-     * Creator relationship (with soft-deleted support).
-     */
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 
-    /*
-     * Updater relationship (with soft-deleted support).
-     */
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by')->withTrashed();
@@ -107,9 +93,6 @@ class User extends Authenticatable
 
     // ---------------- Authorization Logic ----------------
 
-    /*
-     * Automatically hash password when setting it.
-     */
     public function setPasswordAttribute($value)
     {
         if (!empty($value)) {
@@ -117,10 +100,6 @@ class User extends Authenticatable
         }
     }
 
-    /*
-     * Cached user permissions.
-     * Prevents multiple DB queries within the same request lifecycle.
-     */
     public function getCachedPermissions()
     {
         return Cache::remember(
@@ -139,9 +118,6 @@ class User extends Authenticatable
         );
     }
 
-    /*
-     * Check if user has a specific role.
-     */
     public function hasRole($role): bool
     {
         $roles = $this->roles->pluck('name')->toArray();
@@ -153,18 +129,11 @@ class User extends Authenticatable
         return in_array($role, $roles);
     }
 
-    /*
-     * Check if user has a specific permission.
-     * Uses cached permissions for performance optimization.
-     */
     public function hasPermission(string $permission): bool
     {
         return in_array($permission, $this->getCachedPermissions());
     }
 
-    /*
-     * Scope to filter only active users.
-     */
     public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true);

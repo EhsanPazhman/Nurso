@@ -6,19 +6,17 @@ use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Repositories\PatientRepository;
 use Illuminate\Support\Facades\DB;
+use DomainException;
 
 class PatientService
 {
     public function __construct(protected PatientRepository $repository) {}
 
-    /**
-     * Create a new patient record with a unique code
-     */
     public function create(array $data): Patient
     {
         return DB::transaction(function () use ($data) {
-            if ($this->repository->existsByNationalId($data['national_id'] ?? '')) {
-                throw new \DomainException('this national ID already registered in system.');
+            if (!empty($data['national_id']) && $this->repository->existsByNationalId($data['national_id'])) {
+                throw new DomainException('National ID already exists.');
             }
 
             $data['patient_code'] = $this->generatePatientCode();
@@ -26,22 +24,16 @@ class PatientService
         });
     }
 
-    /**
-     * Update existing patient information
-     */
     public function update(Patient $patient, array $data): bool
     {
         return DB::transaction(function () use ($patient, $data) {
-            if (isset($data['national_id']) && $this->repository->existsByNationalId($data['national_id'], $patient->id)) {
-                throw new \DomainException('code belongs to another patient.');
+            if (!empty($data['national_id']) && $this->repository->existsByNationalId($data['national_id'], $patient->id)) {
+                throw new DomainException('National ID belongs to another patient.');
             }
             return $this->repository->update($patient, $data);
         });
     }
 
-    /**
-     * Soft delete a patient and set status to inactive
-     */
     public function delete(Patient $patient): void
     {
         DB::transaction(function () use ($patient) {
@@ -50,28 +42,21 @@ class PatientService
         });
     }
 
-    /**
-     * Restore a soft-deleted patient
-     */
     public function restore(int $id): Patient
     {
         return $this->repository->restore($id);
     }
 
-    /**
-     * Generate a unique patient code (Format: PT-YYYY-000001)
-     */
     protected function generatePatientCode(): string
     {
         $year = now()->year;
-
         $lastPatient = Patient::withTrashed()
             ->whereYear('created_at', $year)
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->first();
 
         $nextNumber = 1;
-        if ($lastPatient && $lastPatient->patient_code) {
+        if ($lastPatient?->patient_code) {
             $lastNumber = (int) substr($lastPatient->patient_code, -6);
             $nextNumber = $lastNumber + 1;
         }
@@ -79,9 +64,6 @@ class PatientService
         return sprintf('PT-%s-%06d', $year, $nextNumber);
     }
 
-    /**
-     * Record new vital signs for a patient
-     */
     public function recordVitals(Patient $patient, array $data): Vital
     {
         return DB::transaction(function () use ($patient, $data) {
@@ -90,24 +72,18 @@ class PatientService
         });
     }
 
-    /**
-     * Get the latest vitals for all patients in the user's department
-     */
     public function getDepartmentVitals(int $perPage = 15)
     {
         $user = auth()->user();
 
-        return Vital::query()
-            ->with(['patient.department', 'user'])
+        return Vital::with(['patient.department', 'user'])
             ->whereHas('patient', function ($q) use ($user) {
                 $q->where('status', 'active');
-
-                // Scope by department if NOT an admin
                 if (!$user->hasRole(['super_admin', 'hospital_admin'])) {
                     $q->where('department_id', $user->department_id);
                 }
             })
-            ->latest('recorded_at') // Crucial for a "Monitor Feed"
+            ->latest('recorded_at')
             ->paginate($perPage);
     }
 }

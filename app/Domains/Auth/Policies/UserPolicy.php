@@ -15,7 +15,7 @@ class UserPolicy
             return false;
         }
 
-        if ($user->hasPermission('super_admin')) {
+        if ($user->hasPermission('system.super')) {
             return true;
         }
 

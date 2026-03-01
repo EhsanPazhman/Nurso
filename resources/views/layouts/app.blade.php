@@ -53,7 +53,7 @@
             <p x-show="isSidebarExpanded" x-cloak
                 class="mt-6 px-2 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medical Services
             </p>
-            
+
             @can('viewAny', App\Domains\Patient\Models\Patient::class)
                 <a href="{{ route('patients.index') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('patients.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
@@ -74,7 +74,6 @@
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h2l2 9l4-18l2 9h2" />
                     </svg>
-
                     <span x-show="isSidebarExpanded" x-cloak x-transition.opacity class="whitespace-nowrap">Clinical
                         Monitor</span>
 
@@ -100,7 +99,7 @@
 
             @can('viewAny', \App\Domains\Auth\Models\User::class)
                 <a href="{{ route('staff.index') }}" wire:navigate
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition-colors group">
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('staff.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
