@@ -58,12 +58,12 @@ class PatientList extends Component
 
         $this->dispatch('notify', type: 'success', message: 'Status updated');
     }
-    
 
-    public function render(PatientRepository $repository)
+
+    public function render(PatientService $service)
     {
         return view('livewire.patient.patient-list', [
-            'patients' => $repository->paginate(10, [
+            'patients' => $service->paginate(10, [
                 'search' => $this->search,
                 'status' => $this->status,
                 'only_trashed' => $this->showTrashed,
