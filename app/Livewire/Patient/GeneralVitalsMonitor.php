@@ -12,8 +12,10 @@ class GeneralVitalsMonitor extends Component
 
     public function render(PatientService $patientService)
     {
+        $vitals = $patientService->getDepartmentVitals(perPage: 10);
+
         return view('livewire.patient.general-vitals-monitor', [
-            'vitals' => $patientService->getDepartmentVitals(12) 
+            'vitals' => $vitals
         ])->layout('layouts.app');
     }
 }
