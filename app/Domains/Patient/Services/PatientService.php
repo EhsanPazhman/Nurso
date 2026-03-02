@@ -3,7 +3,9 @@
 namespace App\Domains\Patient\Services;
 
 use App\Domains\Auth\Models\User;
+use App\Domains\Auth\Repositories\AuthRepository;
 use App\Domains\Department\Models\Department;
+use App\Domains\Department\Repositories\DepartmentRepository;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Repositories\PatientRepository;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class PatientService
 {
-    public function __construct(protected PatientRepository $repository) {}
+    public function __construct(protected PatientRepository $repository, protected DepartmentRepository $departmentRepository, protected AuthRepository $authRepository) {}
 
 
     /* =========================
@@ -237,5 +239,29 @@ class PatientService
             'status', 'gender' => str($value)->headline(),
             default => (string) $value,
         };
+    }
+
+    public function getActiveDepartments()
+    {
+        return $this->departmentRepository->getActive();
+    }
+
+    public function getDoctorsByDepartment(?int $departmentId = null)
+    {
+        $user = auth()->user();
+
+        // Role / Department-level check
+        if ($user->hasRole(['super_admin', 'hospital_admin'])) {
+            // full access
+            return $this->authRepository->getDoctors(departmentId: $departmentId);
+        } elseif ($user->hasPermissionTo('patient.view.department')) {
+            $departmentId = $user->department_id;
+            return $this->authRepository->getDoctors(departmentId: $departmentId);
+        } elseif ($user->hasPermissionTo('patient.view.own')) {
+            return $this->authRepository->getDoctors(departmentId: $user->department_id)
+                ->where('id', $user->id);
+        } else {
+            abort(403);
+        }
     }
 }

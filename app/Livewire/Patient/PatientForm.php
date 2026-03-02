@@ -5,8 +5,6 @@ namespace App\Livewire\Patient;
 use Livewire\Component;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
-use App\Domains\Department\Models\Department;
-use App\Domains\Auth\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class PatientForm extends Component
@@ -73,13 +71,11 @@ class PatientForm extends Component
         }
     }
 
-    public function render()
+    public function render(PatientService $service)
     {
         return view('livewire.patient.patient-form', [
-            'departments' => Department::where('is_active', true)->get(),
-            'doctors' => User::whereHas('roles', fn($q) => $q->where('name', 'doctor'))
-                ->when($this->department_id, fn($q) => $q->where('department_id', $this->department_id))
-                ->get(),
+            'departments' => $service->getActiveDepartments(),
+            'doctors' => $service->getDoctorsByDepartment($this->department_id),
         ])->layout('layouts.app');
     }
 }

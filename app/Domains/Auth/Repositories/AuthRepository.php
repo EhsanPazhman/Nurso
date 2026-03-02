@@ -46,4 +46,11 @@ class AuthRepository
     {
         return User::create($data);
     }
+
+    public function getDoctors(?int $departmentId = null)
+    {
+        return User::whereHas('roles', fn($q) => $q->where('name', 'doctor'))
+            ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
+            ->get();
+    }
 }
