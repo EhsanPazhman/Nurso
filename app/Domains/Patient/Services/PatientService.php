@@ -2,11 +2,14 @@
 
 namespace App\Domains\Patient\Services;
 
+use App\Domains\Auth\Models\User;
+use App\Domains\Department\Models\Department;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Repositories\PatientRepository;
-use Illuminate\Support\Facades\DB;
 use DomainException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PatientService
 {
@@ -161,5 +164,78 @@ class PatientService
         }
 
         return sprintf('PT-%s-%06d', $year, $nextNumber);
+    }
+
+    public function getPatientTimeline(int $patientId): Collection
+    {
+        $user = auth()->user();
+
+        $patient = $this->repository->findOrFail($patientId);
+
+        if (!$patient) {
+            abort(404);
+        }
+
+        // Role-based access control
+        if ($user->hasRole(['super_admin', 'hospital_admin'])) {
+            // full access
+        } elseif ($user->hasPermission('patient.view.department')) {
+            if (!$user->department_id || $patient->department_id !== $user->department_id) {
+                abort(403);
+            }
+        } elseif ($user->hasPermissionTo('patient.view.own')) {
+            if ($patient->doctor_id !== $user->id) {
+                abort(403);
+            }
+        } else {
+            abort(403);
+        }
+
+        $activities = $this->repository->getPatientActivities($patientId);
+
+        return $activities
+            ->map(function ($activity) {
+
+                $localTime = $activity->created_at->timezone('Asia/Kabul');
+
+                $activity->time_formatted = $localTime->format('h:i A');
+                $activity->date_formatted = $localTime->format('Y/m/d');
+
+                if ($activity->description === 'updated' && isset($activity->changes['attributes'])) {
+
+                    $changes = [];
+
+                    foreach ($activity->changes['attributes'] as $key => $value) {
+
+                        if (in_array($key, ['updated_at', 'id'])) continue;
+
+                        $oldValue = $activity->changes['old'][$key] ?? null;
+                        if ($oldValue == $value) continue;
+
+                        $changes[] = [
+                            'label' => str_replace('_', ' ', $key),
+                            'old'   => $this->getHumanValue($key, $oldValue),
+                            'new'   => $this->getHumanValue($key, $value),
+                        ];
+                    }
+
+                    $activity->custom_changes = $changes;
+                }
+
+                return $activity;
+            })
+            ->reject(fn($a) => $a->description === 'updated' && empty($a->custom_changes));
+    }
+
+    protected function getHumanValue(string $key, $value): string
+    {
+        if ($value === null || $value === '') return 'N/A';
+
+        return match ($key) {
+            'doctor_id' => User::find($value)?->name ?? 'Deleted User',
+            'department_id' => Department::find($value)?->name ?? 'Deleted Dept',
+            'status', 'gender' => str($value)->headline(),
+            default => (string) $value,
+        };
     }
 }
