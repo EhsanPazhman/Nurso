@@ -62,13 +62,10 @@ class RecordVitals extends Component
         }
     }
 
-    public function render()
+    public function render(PatientService $service)
     {
         return view('livewire.patient.record-vitals', [
-            'vitalsHistory' => $this->patient->vitals()
-                ->with('user')
-                ->latest('recorded_at')
-                ->paginate(10)
+            'vitalsHistory' => $service->getPatientVitals($this->patient, 10)
         ])->layout('layouts.app');
     }
 }

@@ -13,6 +13,14 @@ class PatientRepository
 {
     public function __construct(protected Patient $model) {}
 
+
+    public function getPatientVitals(int $patientId, int $perPage = 10)
+    {
+        return Vital::where('patient_id', $patientId)
+            ->with('user')
+            ->latest('recorded_at')
+            ->paginate($perPage);
+    }
     /* =========================
      |  Query Methods
      ==========================*/

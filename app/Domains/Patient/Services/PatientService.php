@@ -264,4 +264,26 @@ class PatientService
             abort(403);
         }
     }
+
+    public function getPatientVitals(Patient $patient, int $perPage = 10)
+    {
+        $user = auth()->user();
+
+        // Role / Department check
+        if ($user->hasRole(['super_admin', 'hospital_admin'])) {
+            // full access
+        } elseif ($user->hasPermissionTo('patient.view.department')) {
+            if ($patient->department_id !== $user->department_id) {
+                abort(403);
+            }
+        } elseif ($user->hasPermissionTo('patient.view.own')) {
+            if ($patient->doctor_id !== $user->id) {
+                abort(403);
+            }
+        } else {
+            abort(403);
+        }
+
+        return $this->repository->getPatientVitals($patient->id, $perPage);
+    }
 }
