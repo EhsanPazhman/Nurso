@@ -6,6 +6,8 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Models\Vital;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Collection;
 
 class PatientRepository
 {
@@ -142,5 +144,17 @@ class PatientRepository
     public function addVitals(Patient $patient, array $data): Vital
     {
         return $patient->vitals()->create($data);
+    }
+
+    /* =========================
+     |  Patient Activity Log
+     ==========================*/
+    public function getPatientActivities(int $patientId): Collection
+    {
+        return Activity::where('subject_type', \App\Domains\Patient\Models\Patient::class)
+            ->where('subject_id', $patientId)
+            ->with('causer')
+            ->latest()
+            ->get();
     }
 }
