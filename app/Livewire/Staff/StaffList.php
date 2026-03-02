@@ -3,11 +3,9 @@
 namespace App\Livewire\Staff;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\AuthService;
-use App\Domains\Auth\Repositories\AuthRepository;
-use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class StaffList extends Component
 {
@@ -29,12 +27,19 @@ class StaffList extends Component
 
     public function toggleStatus(int $userId, AuthService $authService): void
     {
+        $user = $authService->findById($userId); 
+        $this->authorize('update', $user);
+
         $authService->toggleStatus($userId);
+
         $this->dispatch('notify', type: 'success', message: 'Staff status updated.');
     }
 
     public function deleteStaff(int $userId, AuthService $authService): void
     {
+        $user = $authService->findById($userId);
+        $this->authorize('delete', $user);
+
         try {
             $authService->deleteStaff($userId);
             $this->dispatch('notify', type: 'success', message: 'Staff member moved to trash.');
@@ -45,16 +50,19 @@ class StaffList extends Component
 
     public function restoreStaff(int $userId, AuthService $authService): void
     {
+        $user = $authService->findTrashedById($userId);
+        $this->authorize('restore', $user);
+
         $authService->restoreStaff($userId);
+
         $this->dispatch('notify', type: 'success', message: 'Staff member restored successfully.');
     }
 
-    public function render(AuthRepository $userRepository)
+    public function render(AuthService $authService)
     {
-        // Decide which list to fetch based on toggle
         $staff = $this->showTrashed
-            ? $userRepository->getTrashedStaff($this->search, 10)
-            : $userRepository->getStaffList($this->search, 10);
+            ? $authService->getTrashedStaff($this->search, 10)
+            : $authService->getStaffList($this->search, 10);
 
         return view('livewire.staff.staff-list', [
             'staffMembers' => $staff

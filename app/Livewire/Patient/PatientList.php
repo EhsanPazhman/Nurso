@@ -4,9 +4,7 @@ namespace App\Livewire\Patient;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
-use App\Domains\Patient\Repositories\PatientRepository;
 
 class PatientList extends Component
 {

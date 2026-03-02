@@ -2,16 +2,20 @@
 
 namespace App\Domains\Auth\Services;
 
-use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Models\Role;
+use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Repositories\AuthRepository;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
+use App\Domains\Department\Repositories\DepartmentRepository;
 use DomainException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-    public function __construct(protected AuthRepository $repository) {}
+    public function __construct(
+        protected AuthRepository $repository,
+        protected DepartmentRepository $departmentRepository
+    ) {}
 
     public function register(array $data): User
     {
@@ -32,6 +36,16 @@ class AuthService
 
             return $user;
         });
+    }
+
+    public function getStaffList(string $search = '', int $perPage = 10)
+    {
+        return $this->repository->getStaffList($search, $perPage);
+    }
+
+    public function getTrashedStaff(string $search = '', int $perPage = 10)
+    {
+        return $this->repository->getTrashedStaff($search, $perPage);
     }
 
     public function updateStaff(int $userId, array $data): User
@@ -96,5 +110,24 @@ class AuthService
     {
         $user = $this->repository->findTrashedById($userId);
         return $user->restore();
+    }
+
+    public function findById(int $id): User
+    {
+        return $this->repository->findById($id);
+    }
+
+    public function findTrashedById(int $id): User
+    {
+        return $this->repository->findTrashedById($id);
+    }
+
+    public function getRoles()
+    {
+        return $this->repository->getRoles();
+    }
+    public function getActiveDepartments()
+    {
+        return $this->departmentRepository->getActive();
     }
 }

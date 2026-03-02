@@ -2,6 +2,7 @@
 
 namespace App\Domains\Auth\Repositories;
 
+use App\Domains\Auth\Models\Role;
 use App\Domains\Auth\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -22,6 +23,10 @@ class AuthRepository
         return User::onlyTrashed()->findOrFail($id);
     }
 
+    public function getRoles()
+    {
+        return Role::all();
+    }
     public function getStaffList(string $search = '', int $perPage = 10): LengthAwarePaginator
     {
         return User::with(['roles', 'department', 'creator'])
