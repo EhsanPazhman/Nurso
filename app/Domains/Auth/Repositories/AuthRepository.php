@@ -8,6 +8,21 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class AuthRepository
 {
+    public function assignRole(User $user, string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role) {
+            $user->roles()->attach($role);
+        }
+    }
+
+    public function syncRole(User $user, string $roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role) {
+            $user->roles()->sync([$role->id]);
+        }
+    }
     public function findByEmail(string $email): ?User
     {
         return User::where('email', $email)->first();
@@ -50,6 +65,11 @@ class AuthRepository
     public function create(array $data): User
     {
         return User::create($data);
+    }
+    public function update(User $user, array $data): User
+    {
+        $user->update($data);
+        return $user;
     }
 
     public function getDoctors(?int $departmentId = null)

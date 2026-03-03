@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Auth;
 
+use App\Domains\Auth\Services\AuthService;
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 
 class Login extends Component
 {
@@ -11,23 +11,19 @@ class Login extends Component
     public string $password = '';
     public bool $remember = false;
 
-    public function login()
+    public function login(AuthService $authService)
     {
-        $credentials = $this->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            $user = $authService->attemptLogin($this->email, $this->password);
 
-        if (Auth::attempt($credentials, $this->remember)) {
+            auth()->login($user, $this->remember);
+
             session()->regenerate();
 
-            return redirect()->intended('dashboard')->with('notify', [
-                'type' => 'success',
-                'message' => 'Logged in successfully',
-            ]);
+            return redirect()->intended('dashboard');
+        } catch (\DomainException $e) {
+            $this->addError('email', $e->getMessage());
         }
-
-        $this->addError('email', 'The provided credentials do not match our records.');
     }
 
     public function render()

@@ -20,18 +20,10 @@ class AuthService
     public function register(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            $user = $this->repository->create([
-                'name'          => $data['name'],
-                'email'         => $data['email'],
-                'password'      => Hash::make($data['password']),
-                'phone'         => $data['phone'] ?? null,
-                'department_id' => $data['department_id'] ?? null,
-                'is_active'     => true,
-            ]);
+            $user = $this->repository->create($data);
 
-            if (isset($data['role'])) {
-                $role = Role::where('name', $data['role'])->first();
-                if ($role) $user->roles()->attach($role);
+            if (!empty($data['role'])) {
+                $this->repository->assignRole($user, $data['role']);
             }
 
             return $user;
@@ -53,27 +45,20 @@ class AuthService
         return DB::transaction(function () use ($userId, $data) {
             $user = $this->repository->findById($userId);
 
-            $updateData = [
-                'name'          => $data['name'],
-                'email'         => $data['email'],
-                'phone'         => $data['phone'] ?? $user->phone,
-                'department_id' => $data['department_id'] ?? $user->department_id,
-            ];
-
-            if (!empty($data['password'])) {
-                $updateData['password'] = Hash::make($data['password']);
+            if (empty($data['password'])) {
+                unset($data['password']);
             }
 
-            $user->update($updateData);
+            $user = $this->repository->update($user, $data);
 
             if (!empty($data['role'])) {
-                $role = Role::where('name', $data['role'])->first();
-                if ($role) $user->roles()->sync([$role->id]);
+                $this->repository->syncRole($user, $data['role']);
             }
 
             return $user;
         });
     }
+
 
     public function attemptLogin(string $email, string $password): User
     {
