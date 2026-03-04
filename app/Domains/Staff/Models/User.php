@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Auth\Models;
+namespace App\Domains\Staff\Models;
 
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -57,10 +57,10 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logAll() // همه فیلدهای قابل تغییر را لاگ می‌کند
-            ->logOnlyDirty() // فقط تغییرات واقعی
+            ->logAll() 
+            ->logOnlyDirty() 
             ->dontSubmitEmptyLogs()
-            ->useLogName('user_audit') // نام جدول/گروه لاگ
+            ->useLogName('user_audit') 
             ->setDescriptionForEvent(fn(string $eventName) => "User record $eventName");
     }
 

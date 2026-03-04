@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Domains\Auth\Repositories;
+namespace App\Domains\Staff\Repositories;
 
 use App\Domains\Auth\Models\Role;
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class AuthRepository
+class StaffRepository
 {
     public function assignRole(User $user, string $roleName): void
     {
