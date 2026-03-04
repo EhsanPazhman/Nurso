@@ -1,23 +1,29 @@
 <?php
 
-namespace App\Domains\Auth\Requests;
+namespace App\Domains\Staff\Requests;
 
-use App\Domains\Auth\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class RegisterRequest extends FormRequest
+class UpdateStaffRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', User::class);
+        return true;
     }
 
     public function rules(): array
     {
+        $userId = $this->route('staff') ?? $this->id;
+
         return [
             'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:users,email',
-            'password'      => 'required|string|min:8',
+            'email'         => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($userId),
+            ],
+            'password'      => 'nullable|string|min:8',
             'role'          => 'required|exists:roles,name',
             'department_id' => 'nullable|exists:departments,id',
             'phone'         => 'nullable|string|max:20',
