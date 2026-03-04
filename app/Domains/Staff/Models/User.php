@@ -57,10 +57,10 @@ class User extends Authenticatable
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logAll() 
-            ->logOnlyDirty() 
+            ->logAll()
+            ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('user_audit') 
+            ->useLogName('user_audit')
             ->setDescriptionForEvent(fn(string $eventName) => "User record $eventName");
     }
 

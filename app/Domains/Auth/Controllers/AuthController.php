@@ -6,10 +6,7 @@ use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Domains\Auth\Models\User;
 use App\Domains\Auth\Services\AuthService;
-use App\Domains\Auth\Requests\RegisterRequest;
-use App\Domains\Auth\Requests\UpdateStaffRequest;
 use App\Domains\Auth\Resources\UserResource;
 
 class AuthController extends Controller
@@ -46,28 +43,6 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
             ], 401);
         }
-    }
-
-    public function register(RegisterRequest $request): JsonResponse
-    {
-        $user = $this->authService->register($request->validated());
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Staff registered successfully',
-            'data'    => new UserResource($user->load(['roles', 'department'])),
-        ], 201);
-    }
-
-    public function update(UpdateStaffRequest $request, User $staff): JsonResponse
-    {
-        $user = $this->authService->updateStaff($staff, $request->validated());
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Staff updated successfully',
-            'data'    => new UserResource($user->load(['roles', 'department'])),
-        ]);
     }
 
     public function me(Request $request): JsonResponse
