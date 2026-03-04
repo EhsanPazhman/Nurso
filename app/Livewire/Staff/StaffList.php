@@ -4,7 +4,7 @@ namespace App\Livewire\Staff;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Auth\Services\AuthService;
 
 class StaffList extends Component
@@ -27,7 +27,7 @@ class StaffList extends Component
 
     public function toggleStatus(int $userId, AuthService $authService): void
     {
-        $user = $authService->findById($userId); 
+        $user = $authService->findById($userId);
         $this->authorize('update', $user);
 
         $authService->toggleStatus($userId);

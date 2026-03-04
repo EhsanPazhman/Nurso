@@ -97,7 +97,7 @@
                     class="whitespace-nowrap">Appointments</span>
             </a>
 
-            @can('viewAny', \App\Domains\Auth\Models\User::class)
+            @can('viewAny', \App\Domains\Staff\Models\User::class)
                 <a href="{{ route('staff.index') }}" wire:navigate
                     class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors group {{ request()->routeIs('staff.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

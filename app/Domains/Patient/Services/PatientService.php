@@ -2,8 +2,8 @@
 
 namespace App\Domains\Patient\Services;
 
-use App\Domains\Auth\Models\User;
-use App\Domains\Auth\Repositories\AuthRepository;
+use App\Domains\Staff\Models\User;
+use App\Domains\Staff\Repositories\StaffRepository;
 use App\Domains\Department\Models\Department;
 use App\Domains\Department\Repositories\DepartmentRepository;
 use App\Domains\Patient\Models\Patient;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class PatientService
 {
-    public function __construct(protected PatientRepository $repository, protected DepartmentRepository $departmentRepository, protected AuthRepository $authRepository) {}
+    public function __construct(protected PatientRepository $repository, protected DepartmentRepository $departmentRepository, protected StaffRepository $authRepository) {}
 
 
     /* =========================

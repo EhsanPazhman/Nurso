@@ -2,7 +2,7 @@
 
 namespace App\Domains\Patient\Models;
 
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;

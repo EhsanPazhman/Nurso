@@ -43,11 +43,11 @@ Route::middleware(['auth'])->group(function () {
     // =========================
     Route::prefix('staff')->name('staff.')->group(function () {
         Route::get('/', StaffList::class)
-            ->middleware('can:viewAny,App\Domains\Auth\Models\User')
+            ->middleware('can:viewAny,App\Domains\Staff\Models\User')
             ->name('index');
 
         Route::get('/create', Register::class)
-            ->middleware('can:create,App\Domains\Auth\Models\User')
+            ->middleware('can:create,App\Domains\Staff\Models\User')
             ->name('create');
 
         Route::get('/{staff}/edit', Register::class)

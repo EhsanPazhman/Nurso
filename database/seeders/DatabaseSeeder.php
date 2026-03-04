@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Auth\Seeders\RoleSeeder;
 use App\Domains\Auth\Seeders\PermissionSeeder;
 use App\Domains\Department\Seeders\DepartmentSeeder;

@@ -2,7 +2,7 @@
 
 namespace App\Domains\Patient\Repositories;
 
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Models\Vital;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

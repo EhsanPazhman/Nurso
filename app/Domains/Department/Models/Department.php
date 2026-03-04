@@ -3,7 +3,7 @@
 namespace App\Domains\Department\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Patient\Models\Patient;
 
 class Department extends Model

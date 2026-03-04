@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-use App\Domains\Auth\Models\User;
-use App\Domains\Auth\Policies\UserPolicy;
+use App\Domains\Staff\Models\User;
+use App\Domains\Staff\Policies\StaffPolicy;
 
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Policies\PatientPolicy;
@@ -13,7 +13,7 @@ use App\Domains\Patient\Policies\PatientPolicy;
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        User::class => UserPolicy::class,
+        User::class => StaffPolicy::class,
         Patient::class => PatientPolicy::class,
     ];
 

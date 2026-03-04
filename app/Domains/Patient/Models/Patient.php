@@ -2,7 +2,7 @@
 
 namespace App\Domains\Patient\Models;
 
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Department\Models\Department;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

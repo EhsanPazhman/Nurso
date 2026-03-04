@@ -2,7 +2,7 @@
 
 namespace App\Domains\Patient\Policies;
 
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Patient\Models\Patient;
 
 class PatientPolicy

@@ -3,7 +3,7 @@
 namespace App\Livewire\Staff;
 
 use Livewire\Component;
-use App\Domains\Auth\Models\User;
+use App\Domains\Staff\Models\User;
 use App\Domains\Auth\Models\Role;
 use App\Domains\Auth\Services\AuthService;
 use App\Domains\Department\Models\Department;
