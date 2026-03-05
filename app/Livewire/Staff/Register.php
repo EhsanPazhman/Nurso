@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Staff;
 
-use Livewire\Component;
 use App\Domains\Staff\Models\User;
-use App\Domains\Auth\Models\Role;
-use App\Domains\Auth\Services\AuthService;
-use App\Domains\Department\Models\Department;
+use App\Domains\Staff\Requests\UpdateStaffRequest;
+use App\Domains\Staff\Requests\RegisterStaffRequest;
+use App\Domains\Staff\Services\StaffService;
+use Livewire\Component;
 
 class Register extends Component
 {
@@ -43,13 +43,13 @@ class Register extends Component
     protected function rules(): array
     {
         if ($this->staff) {
-            return (new \App\Domains\Auth\Requests\UpdateStaffRequest(['id' => $this->staff->id]))->rules();
+            return (new UpdateStaffRequest(['id' => $this->staff->id]))->rules();
         }
 
-        return (new \App\Domains\Auth\Requests\RegisterRequest())->rules();
+        return (new RegisterStaffRequest())->rules();
     }
 
-    public function submit(AuthService $authService)
+    public function submit(StaffService $staffService)
     {
         if ($this->department_id === '') {
             $this->department_id = null;
@@ -60,11 +60,11 @@ class Register extends Component
         try {
             if ($this->staff) {
                 $this->authorize('update', $this->staff);
-                $authService->updateStaff($this->staff->id, $validated);
+                $staffService->updateStaff($this->staff->id, $validated);
                 $message = 'Staff record updated successfully.';
             } else {
                 $this->authorize('create', User::class);
-                $authService->register($validated);
+                $staffService->register($validated);
                 $message = 'Staff member registered successfully.';
             }
 
@@ -76,11 +76,11 @@ class Register extends Component
         }
     }
 
-    public function render(AuthService $authService)
+    public function render(StaffService $staffService)
     {
         return view('livewire.staff.register', [
-            'roles' => $authService->getRoles(),
-            'departments' => $authService->getActiveDepartments(),
+            'roles' => $staffService->getRoles(),
+            'departments' => $staffService->getActiveDepartments(),
         ])->layout('layouts.app');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Domains\Staff\Requests;
 use App\Domains\Staff\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StaffRegisterRequest extends FormRequest
+class RegisterStaffRequest extends FormRequest
 {
     public function authorize(): bool
     {

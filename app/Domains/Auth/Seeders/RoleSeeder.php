@@ -32,6 +32,7 @@ class RoleSeeder extends Seeder
                     'staff.create',
                     'staff.update.any',
                     'staff.delete.any',
+                    'staff.restore',
 
                     'admission.manage',
                     'department.manage',

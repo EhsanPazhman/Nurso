@@ -48,6 +48,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'staff.update.own', 'label' => 'Update own profile'],
             ['name' => 'staff.delete.any', 'label' => 'Delete any staff'],
             ['name' => 'staff.delete.own', 'label' => 'Delete own account'],
+            ['name' => 'staff.restore', 'label' => 'Restore deleted staff'],
 
             /*
             |--------------------------------------------------------------------------

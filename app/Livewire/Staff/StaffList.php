@@ -5,7 +5,7 @@ namespace App\Livewire\Staff;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Domains\Staff\Models\User;
-use App\Domains\Auth\Services\AuthService;
+use App\Domains\Staff\Services\StaffService;
 
 class StaffList extends Component
 {
@@ -25,44 +25,44 @@ class StaffList extends Component
         $this->resetPage();
     }
 
-    public function toggleStatus(int $userId, AuthService $authService): void
+    public function toggleStatus(int $userId, StaffService $staffService): void
     {
-        $user = $authService->findById($userId);
+        $user = $staffService->findById($userId);
         $this->authorize('update', $user);
 
-        $authService->toggleStatus($userId);
+        $staffService->toggleStatus($userId);
 
         $this->dispatch('notify', type: 'success', message: 'Staff status updated.');
     }
 
-    public function deleteStaff(int $userId, AuthService $authService): void
+    public function deleteStaff(int $userId, StaffService $staffService): void
     {
-        $user = $authService->findById($userId);
+        $user = $staffService->findById($userId);
         $this->authorize('delete', $user);
 
         try {
-            $authService->deleteStaff($userId);
+            $staffService->deleteStaff($userId);
             $this->dispatch('notify', type: 'success', message: 'Staff member moved to trash.');
         } catch (\DomainException $e) {
             $this->dispatch('notify', type: 'error', message: $e->getMessage());
         }
     }
 
-    public function restoreStaff(int $userId, AuthService $authService): void
+    public function restoreStaff(int $userId, StaffService $staffService): void
     {
-        $user = $authService->findTrashedById($userId);
+        $user = $staffService->findTrashedById($userId);
         $this->authorize('restore', $user);
 
-        $authService->restoreStaff($userId);
+        $staffService->restoreStaff($userId);
 
         $this->dispatch('notify', type: 'success', message: 'Staff member restored successfully.');
     }
 
-    public function render(AuthService $authService)
+    public function render(StaffService $staffService)
     {
         $staff = $this->showTrashed
-            ? $authService->getTrashedStaff($this->search, 10)
-            : $authService->getStaffList($this->search, 10);
+            ? $staffService->getTrashedStaff($this->search, 10)
+            : $staffService->getStaffList($this->search, 10);
 
         return view('livewire.staff.staff-list', [
             'staffMembers' => $staff

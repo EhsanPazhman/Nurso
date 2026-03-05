@@ -69,4 +69,8 @@ class StaffPolicy
 
         return false;
     }
+    public function restore(User $user, User $model): bool
+    {
+        return $user->hasPermission('staff.delete.any');
+    }
 }
