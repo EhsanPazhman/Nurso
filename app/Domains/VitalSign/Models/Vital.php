@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domains\Patient\Models;
+namespace App\Domains\VitalSign\Models;
 
+use App\Domains\Patient\Models\Patient;
 use App\Domains\Staff\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
