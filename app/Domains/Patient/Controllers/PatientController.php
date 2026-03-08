@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
 use App\Domains\Patient\Requests\StorePatientRequest;
-use App\Domains\Patient\Requests\PatientVitalsRequest;
+use App\Domains\VitalSign\Requests\VitalSignRequest;
 use App\Domains\Patient\Requests\UpdatePatientRequest;
 use App\Domains\Patient\Repositories\PatientRepository;
 use App\Domains\Patient\Resources\PatientResource;
@@ -50,7 +50,7 @@ class PatientController extends Controller
         ], 201);
     }
 
-    public function storeVitals(PatientVitalsRequest $request, Patient $patient): JsonResponse
+    public function storeVitals(VitalSignRequest $request, Patient $patient): JsonResponse
     {
         $vital = $this->service->recordVitals($patient, $request->validated());
 

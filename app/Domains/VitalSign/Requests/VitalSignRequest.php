@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domains\Patient\Requests;
+namespace App\Domains\VitalSign\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
 
-class PatientVitalsRequest extends FormRequest
+class VitalSignRequest extends FormRequest
 {
     public function authorize(): bool
     {

@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
-use App\Domains\Patient\Requests\PatientVitalsRequest;
+use App\Domains\VitalSign\Requests\VitalSignRequest;
 
 class RecordVitals extends Component
 {
@@ -30,7 +30,7 @@ class RecordVitals extends Component
 
     protected function rules(): array
     {
-        return (new PatientVitalsRequest())->rules();
+        return (new VitalSignRequest())->rules();
     }
 
     /**
