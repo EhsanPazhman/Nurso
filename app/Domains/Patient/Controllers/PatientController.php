@@ -8,11 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Domains\Patient\Models\Patient;
 use App\Domains\Patient\Services\PatientService;
 use App\Domains\Patient\Requests\StorePatientRequest;
-use App\Domains\VitalSign\Requests\VitalSignRequest;
 use App\Domains\Patient\Requests\UpdatePatientRequest;
 use App\Domains\Patient\Repositories\PatientRepository;
 use App\Domains\Patient\Resources\PatientResource;
-use App\Domains\Patient\Resources\VitalResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PatientController extends Controller
@@ -47,17 +45,6 @@ class PatientController extends Controller
             'status'  => 'success',
             'message' => 'Patient created successfully',
             'data'    => new PatientResource($patient),
-        ], 201);
-    }
-
-    public function storeVitals(VitalSignRequest $request, Patient $patient): JsonResponse
-    {
-        $vital = $this->service->recordVitals($patient, $request->validated());
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Vitals recorded successfully',
-            'data'    => new VitalResource($vital),
         ], 201);
     }
 
