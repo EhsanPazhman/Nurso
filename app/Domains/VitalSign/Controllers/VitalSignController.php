@@ -4,6 +4,7 @@ namespace App\Domains\VitalSign\Controllers;
 
 use App\Domains\Patient\Models\Patient;
 use App\Domains\VitalSign\Requests\VitalSignRequest;
+use App\Domains\VitalSign\Resources\VitalSignResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +25,7 @@ class VitalSignController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Vitals recorded successfully',
-            'data'    => new VitalResource($vital),
+            'data'    => new VitalSignResource($vital),
         ], 201);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domains\Patient\Resources;
+namespace App\Domains\VitalSign\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class VitalResource extends JsonResource
+class VitalSignResource extends JsonResource
 {
     public function toArray($request): array
     {
