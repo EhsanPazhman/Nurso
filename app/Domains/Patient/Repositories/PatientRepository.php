@@ -2,9 +2,7 @@
 
 namespace App\Domains\Patient\Repositories;
 
-use App\Domains\Staff\Models\User;
 use App\Domains\Patient\Models\Patient;
-use App\Domains\Patient\Models\Vital;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Collection;
@@ -13,14 +11,6 @@ class PatientRepository
 {
     public function __construct(protected Patient $model) {}
 
-
-    public function getPatientVitals(int $patientId, int $perPage = 10)
-    {
-        return Vital::where('patient_id', $patientId)
-            ->with('user')
-            ->latest('recorded_at')
-            ->paginate($perPage);
-    }
     /* =========================
      |  Query Methods
      ==========================*/
@@ -68,34 +58,6 @@ class PatientRepository
             ->whereYear('created_at', $year)
             ->orderByDesc('id')
             ->first();
-    }
-
-    public function getDepartmentVitals(?int $departmentId, User $user, int $perPage)
-    {
-        $query = Vital::query()
-            ->with(['patient.department', 'user'])
-            ->whereHas('patient', function ($q) use ($departmentId, $user) {
-
-                $q->where('status', 'active');
-
-                if ($user->hasPermission('patient.view.any')) {
-                    return;
-                }
-
-                if ($user->hasPermission('patient.view.department')) {
-                    $q->where('department_id', $departmentId);
-                    return;
-                }
-
-                if ($user->hasPermission('patient.view.own')) {
-                    $q->where('doctor_id', $user->id);
-                    return;
-                }
-            });
-
-        return $query
-            ->latest('recorded_at')
-            ->paginate($perPage);
     }
 
     /* =========================
@@ -147,11 +109,6 @@ class PatientRepository
             ->where('national_id', $nationalId)
             ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
             ->exists();
-    }
-
-    public function addVitals(Patient $patient, array $data): Vital
-    {
-        return $patient->vitals()->create($data);
     }
 
     /* =========================
