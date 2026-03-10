@@ -6,6 +6,7 @@ use App\Domains\Patient\Models\Patient;
 use App\Domains\VitalSign\Repositories\VitalSignRepository;
 use App\Domains\VitalSign\Requests\VitalSignRequest;
 use App\Domains\VitalSign\Resources\VitalSignResource;
+use App\Domains\VitalSign\Services\VitalSignService;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;

@@ -2,20 +2,20 @@
 
 namespace App\Domains\Patient\Services;
 
-use App\Domains\Staff\Models\User;
-use App\Domains\Staff\Repositories\StaffRepository;
 use App\Domains\Department\Models\Department;
 use App\Domains\Department\Repositories\DepartmentRepository;
 use App\Domains\Patient\Models\Patient;
-use App\Domains\Patient\Models\Vital;
 use App\Domains\Patient\Repositories\PatientRepository;
+use App\Domains\Staff\Models\User;
+use App\Domains\Staff\Repositories\StaffRepository;
+use App\Domains\VitalSign\Repositories\VitalSignRepository;
 use DomainException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PatientService
 {
-    public function __construct(protected PatientRepository $repository, protected DepartmentRepository $departmentRepository, protected StaffRepository $authRepository) {}
+    public function __construct(protected PatientRepository $repository, protected DepartmentRepository $departmentRepository,protected VitalSignRepository $vitalSignRepository, protected StaffRepository $authRepository) {}
 
 
     /* =========================
@@ -119,34 +119,6 @@ class PatientService
         });
     }
 
-    /* =========================
-     |  Vitals
-     ==========================*/
-
-    public function recordVitals(Patient $patient, array $data): Vital
-    {
-        return DB::transaction(function () use ($patient, $data) {
-
-            $data['user_id'] = auth()->id();
-
-            return $this->repository->addVitals($patient, $data);
-        });
-    }
-
-    public function getDepartmentVitals(int $perPage = 15)
-    {
-        $user = auth()->user();
-
-        $isAdmin = $user->hasRole(['super_admin', 'hospital_admin']);
-        if (!$isAdmin && !$user->department_id) {
-            throw new \DomainException('User is not assigned to any department.');
-        }
-        return $this->repository->getDepartmentVitals(
-            $user->department_id,
-            $user,
-            $perPage
-        );
-    }
 
     /* =========================
      |  Private
@@ -284,6 +256,6 @@ class PatientService
             abort(403);
         }
 
-        return $this->repository->getPatientVitals($patient->id, $perPage);
+        return $this->vitalSignRepository->getPatientVitals($patient->id, $perPage);
     }
 }
