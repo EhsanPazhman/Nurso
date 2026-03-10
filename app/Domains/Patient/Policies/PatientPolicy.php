@@ -89,34 +89,6 @@ class PatientPolicy
     }
 
     /**
-     * Determine whether the user can record vitals.
-     */
-    public function recordVitals(User $user, Patient $patient): bool
-    {
-        if ($user->hasPermission('medical.vitals.any')) {
-            return true;
-        }
-
-        if ($user->hasPermission('medical.vitals.own')) {
-            return (int) $user->id === (int) $patient->doctor_id;
-        }
-
-        if ($user->hasPermission('medical.vitals.department')) {
-            return (int) $user->department_id === (int) $patient->department_id;
-        }
-
-        return false;
-    }
-
-    /**
-     * Determine whether the user can view the patient's timeline.
-     */
-    public function viewTimeline(User $user, Patient $patient): bool
-    {
-        return $this->view($user, $patient);
-    }
-
-    /**
      * Determine whether the user can restore a soft-deleted patient.
      */
     public function restore(User $user, Patient $patient): bool
